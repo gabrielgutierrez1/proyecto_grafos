@@ -1,0 +1,19 @@
+# Byte-compiled / cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Cobertura y pruebas
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archivos de sistema / IDE
+.DS_Store
+.vscode/
+.idea/

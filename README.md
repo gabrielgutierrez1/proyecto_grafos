@@ -2,9 +2,9 @@
 
 **Asignatura:** INFO1158 — Teoría de Grafos  
 **Equipo:** David Fernández, Ailyn Melillán y Gabriel Gutiérrez (3 estudiantes)  
-**Presentación y entrega:** jueves 26 de noviembre de 2026  
-**Entrega del informe PDF:** hasta las 23:00 (Educa)  
-**Presentación presencial:** máximo 12 minutos, con participación de los tres integrantes
+**Presentación y entrega:** lunes 30 de noviembre de 2026  
+**Entrega del informe PDF:** hasta las 15:00 (Educa)  
+\
 
 ## 1. Objetivo
 
@@ -35,16 +35,16 @@ Las dependencias definitivas y el comando de ejecución se documentarán aquí c
 
 **Responsable:** David Fernández
 
-- [ ] Definir el grafo inicial `G = (V, E)` con **10 a 12 vértices** y **14 a 20 arcos**.
-- [ ] Verificar que `s != t`, que ningún vértice esté aislado y que no existan lazos, arcos repetidos ni arcos recíprocos.
-- [ ] Asegurar que el grafo inicial tenga **al menos dos caminos dirigidos de `s` a `t` sin arcos compartidos**.
-- [ ] Documentar los conjuntos `V` y `E` y qué representan físicamente.
-- [ ] Implementar la estructura del grafo, sus arcos activos y la validación de modificaciones.
-- [ ] Investigar y comparar **BFS versus DFS** para buscar caminos dirigidos.
-- [ ] Justificar la estrategia seleccionada para obtener la menor cantidad de arcos.
-- [ ] Implementar BFS desde cero, reconstruyendo un camino mínimo mediante predecesores.
-- [ ] Manejar explícitamente el caso **sin camino** (no asignar longitud numérica).
-- [ ] Crear pruebas del caso normal, múltiples caminos mínimos y destino inalcanzable.
+- [x] Definir el grafo inicial `G = (V, E)` con **10 a 12 vértices** y **14 a 20 arcos**.
+- [x] Verificar que `s != t`, que ningún vértice esté aislado y que no existan lazos, arcos repetidos ni arcos recíprocos.
+- [x] Asegurar que el grafo inicial tenga **al menos dos caminos dirigidos de `s` a `t` sin arcos compartidos**.
+- [x] Documentar los conjuntos `V` y `E` y qué representan físicamente.
+- [x] Implementar la estructura del grafo, sus arcos activos y la validación de modificaciones.
+- [x] Investigar y comparar **BFS versus DFS** para buscar caminos dirigidos.
+- [x] Justificar la estrategia seleccionada para obtener la menor cantidad de arcos.
+- [x] Implementar BFS desde cero, reconstruyendo un camino mínimo mediante predecesores.
+- [x] Manejar explícitamente el caso **sin camino** (no asignar longitud numérica).
+- [x] Crear pruebas del caso normal, múltiples caminos mínimos y destino inalcanzable.
 - [ ] Redactar las secciones del informe sobre modelación, BFS y comparación BFS/DFS, con fuentes.
 
 **Archivos sugeridos:** `src/grafo.py`, `src/camino_minimo.py`, `tests/test_camino_minimo.py`.
@@ -181,21 +181,25 @@ laberintos-rutas/
 
 **Pendiente de completar cuando la aplicación esté implementada.** El equipo agregará la versión mínima de Python requerida, los nombres de las bibliotecas utilizadas, la instalación de dependencias y el comando comprobado para iniciar el simulador. No se especifican comandos todavía para evitar instrucciones que no correspondan al código final.
 
-## 10. Git y coordinación
+## 10. Modo de trabajo y coordinación
 
-- Usar una rama por responsabilidad: `feature/grafo-bfs`, `feature/flujo-corte`, `feature/interfaz`.
-- Crear pull requests pequeños; revisar la integración antes de fusionar.
-- No modificar el formato compartido del grafo ni las firmas de funciones sin avisar al equipo.
-- Agregar pruebas para cada funcionalidad y registrar problemas detectados.
+El equipo trabaja de forma **modular y en paralelo** sobre contratos definidos, evitando conflictos de código y duplicación de lógica:
 
-## 10. Ejecución del proyecto
+- **Separación por módulos:** cada integrante desarrolla en sus archivos asignados (`src/grafo.py` y `src/camino_minimo.py` para Integrante 1; `src/rutas_independientes.py` y `src/corte_minimo.py` para Integrante 2; `src/interfaz.py` y `src/main.py` para Integrante 3).
+- **Contratos fijos:** no modificar la representación compartida (`vertices`, `arcos_activos`, `s`, `t`) ni las firmas acordadas (`camino_minimo`, `rutas_y_corte`) sin avisar al equipo.
+- **Orden y reproducibilidad:** todos los cálculos operan sobre `arcos - bloqueados` y respetan el orden canónico de vecinos (`ordenar_vertices`) para obtener resultados reproducibles.
+- **Flujo en Git:** trabajar en una rama por responsabilidad (`feature/grafo-bfs`, `feature/flujo-corte`, `feature/interfaz`), crear *pull requests* pequeños y revisar la integración antes de fusionar a `main`.
+- **Validación continua:** antes de hacer *merge*, ejecutar la suite de pruebas (`python3 -m unittest discover -s tests -v`) y contrastar contra los escenarios de referencia (`docs/escenarios.md` y `docs/caso_manual.md`).
+- **Implementación propia:** los algoritmos se programan desde cero en Python 3 (sin librerías externas que resuelvan camino mínimo, flujo máximo o corte mínimo); cualquier dependencia visual se declara en `requirements.txt`.
+
+## 11. Ejecución del proyecto
 
 > **Pendiente de completar una vez implementada la aplicación.** No se incluyen comandos ni dependencias ficticias.
 
-- Versión de Python utilizada: `Por definir`.
-- Instalación de dependencias: `Por completar`.
-- Comando de inicio: `Por completar`.
-- Comando de pruebas: `Por completar`.
+- Versión de Python utilizada: `Python 3.10+` (probado en `Python 3.14`).
+- Instalación de dependencias: `Sin dependencias externas por ahora (biblioteca estándar); pendiente definir librería de UI`.
+- Comando de inicio (verificación actual / futura UI): `python3 -m src.main`
+- Comando de pruebas: `python3 -m unittest discover -s tests -v`
 
 ---
 

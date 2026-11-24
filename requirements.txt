@@ -1,0 +1,4 @@
+# Proyecto 1 — INFO1158 Teoría de Grafos
+# El módulo de grafo y búsqueda por amplitud (BFS) utiliza únicamente la
+# biblioteca estándar de Python 3 (collections.deque, unittest, typing).
+# Las dependencias gráficas que seleccione el Integrante 3 se añadirán aquí.
