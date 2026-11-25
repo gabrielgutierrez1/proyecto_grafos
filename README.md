@@ -53,19 +53,17 @@ Las dependencias definitivas y el comando de ejecución se documentarán aquí c
 
 **Responsable:** Ailyn Melillán
 
-- [ ] Investigar y comparar al menos **dos estrategias** para determinar el máximo número de caminos sin arcos compartidos (p. ej., búsqueda de caminos disjuntos y flujo máximo de capacidad unitaria).
-- [ ] Elegir y justificar el enfoque con fuentes académicas o técnicas.
-- [ ] Implementar desde cero el algoritmo de **flujo máximo con capacidad 1 por arco** (por ejemplo, Edmonds–Karp).
-- [ ] Reconstruir y devolver los caminos dirigidos que alcanzan el máximo; permitir vértices compartidos, pero no arcos.
-- [ ] Implementar la identificación de un **corte mínimo de arcos** a partir de la red residual.
-- [ ] Verificar que `cantidad de caminos independientes == cantidad de arcos del corte mínimo`.
-- [ ] Resolver correctamente el caso **sin conexión**: cero caminos independientes y corte vacío.
-- [ ] Preparar pruebas con rutas compartidas, pasillos bloqueados y red sin conexión.
-- [ ] Redactar las secciones del informe sobre comparación de algoritmos, flujo máximo y corte mínimo, con fuentes.
+- [x] Investigar y comparar al menos **dos estrategias** para determinar el máximo número de caminos sin arcos compartidos (p. ej., búsqueda de caminos disjuntos y flujo máximo de capacidad unitaria).
+- [x] Elegir y justificar el enfoque con fuentes académicas o técnicas.
+- [x] Implementar desde cero el algoritmo de **flujo máximo con capacidad 1 por arco** (por ejemplo, Edmonds–Karp).
+- [x] Reconstruir y devolver los caminos dirigidos que alcanzan el máximo; permitir vértices compartidos, pero no arcos.
+- [x] Implementar la identificación de un **corte mínimo de arcos** a partir de la red residual.
+- [x] Verificar que `cantidad de caminos independientes == cantidad de arcos del corte mínimo`.
+- [x] Resolver correctamente el caso **sin conexión**: cero caminos independientes y corte vacío.
+- [x] Preparar pruebas con rutas compartidas, pasillos bloqueados y red sin conexión.
+- [x] Redactar las secciones del informe sobre comparación de algoritmos, flujo máximo y corte mínimo, con fuentes.
 
 **Archivos sugeridos:** `src/rutas_independientes.py`, `src/corte_minimo.py`, `tests/test_flujo_corte.py`.
-
-### Integrante 3 — Interfaz gráfica, interacción y análisis de escenarios
 
 **Responsable:** Gabriel Gutiérrez
 
