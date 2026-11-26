@@ -20,14 +20,14 @@ Desarrollar una aplicación interactiva que represente un laberinto como **grafo
 ## 2. Tecnologías definidas
 
 - **Lenguaje:** Python 3.
-- **Bibliotecas:** bibliotecas estándar de Python y, cuando sea necesario, bibliotecas de Python para la interfaz y la visualización de grafos. **Las bibliotecas concretas aún no están seleccionadas.**
+- **Bibliotecas:** bibliotecas estándar de Python y, cuando sea necesario, bibliotecas de Python para la interfaz y la visualización de grafos. **Interfaz: Tkinter/ttk y Canvas (biblioteca estándar).**
 - **Control de versiones:** Git y GitHub.
 - **Documentación:** Markdown (`README.md`) e informe técnico en PDF.
 - **Algoritmos:** implementación propia de los procedimientos seleccionados para camino mínimo, rutas independientes y corte mínimo.
 
 **Restricción del enunciado:** no utilizar bibliotecas que realicen directamente los cálculos algorítmicos solicitados. Se permiten bibliotecas para representar el grafo y desarrollar la interfaz visual.
 
-Las dependencias definitivas y el comando de ejecución se documentarán aquí cuando se implemente la aplicación.
+La interfaz usa Tkinter sin bibliotecas externas de cálculo. Consulta la sección 9 para ejecutarla.
 
 ## 3. Reparto de responsabilidades
 
@@ -67,18 +67,20 @@ Las dependencias definitivas y el comando de ejecución se documentarán aquí c
 
 **Responsable:** Gabriel Gutiérrez
 
-- [ ] Diseñar una interfaz que muestre **vértices, arcos y direcciones** (flechas).
-- [ ] Permitir seleccionar `s` y `t` distintos mediante controles visuales.
-- [ ] Incluir acciones para **bloquear y restablecer** un pasillo.
-- [ ] Incluir una acción para **agregar un arco dirigido**, validando lazos, duplicados y arcos recíprocos.
-- [ ] Incluir un botón para **calcular/recalcular** los resultados.
-- [ ] Destacar visualmente y de manera distinguible: camino mínimo, caminos independientes y corte mínimo (por ejemplo, capas o modos de visualización).
-- [ ] Mostrar en texto la longitud mínima (o «sin camino»), cantidad de rutas independientes y arcos del corte.
+- [x] Diseñar una interfaz que muestre **vértices, arcos y direcciones** (flechas).
+- [x] Permitir seleccionar `s` y `t` distintos mediante controles visuales.
+- [x] Incluir acciones para **bloquear y restablecer** un pasillo.
+- [x] Incluir una acción para **agregar un arco dirigido**, validando lazos, duplicados y arcos recíprocos.
+- [x] Incluir un botón para **calcular/recalcular** los resultados.
+- [x] Destacar visualmente y de manera distinguible: camino mínimo, caminos independientes y corte mínimo (por ejemplo, capas o modos de visualización).
+- [x] Mostrar en texto la longitud mínima (o «sin camino»), cantidad de rutas independientes y arcos del corte.
 - [ ] Coordinar con los integrantes 1 y 2 la integración de sus módulos.
-- [ ] Construir la comparación de **tres configuraciones**: original y dos modificaciones, manteniendo los mismos `s` y `t` en esa comparación.
+- [x] Construir la comparación de **tres configuraciones**: original y dos modificaciones, manteniendo los mismos `s` y `t` en esa comparación.
 - [ ] Preparar capturas y redactar el análisis de cambios y la descripción de la interfaz para el informe.
 
-**Archivos sugeridos:** `src/interfaz.py`, `src/main.py`, `docs/escenarios.md`.
+**Archivos:** `src/interfaz.py`, `src/main.py`, `src/escenarios.py`, `tests/test_interfaz.py`, `docs/escenarios.md`.
+
+Integración técnica implementada con las firmas existentes. Quedan la revisión conjunta con los integrantes y las capturas de la aplicación en una sesión gráfica; la descripción y el análisis para el informe están en `docs/escenarios.md`.
 
 ## 4. Responsabilidades compartidas
 
@@ -177,7 +179,40 @@ laberintos-rutas/
 
 ## 9. Instalación y ejecución
 
-**Pendiente de completar cuando la aplicación esté implementada.** El equipo agregará la versión mínima de Python requerida, los nombres de las bibliotecas utilizadas, la instalación de dependencias y el comando comprobado para iniciar el simulador. No se especifican comandos todavía para evitar instrucciones que no correspondan al código final.
+Requiere **Python 3.10+** y **Tkinter/Tk**. No requiere paquetes de pip.
+En Debian/Ubuntu, si falta Tkinter: `sudo apt install python3-tk`.
+
+Desde la raíz del repositorio, en una sesión de escritorio:
+
+```bash
+python3 -m src.main
+```
+
+Para verificar resultados sin pantalla (tampoco requiere Tkinter):
+
+```bash
+python3 -m src.main --consola
+```
+
+Pruebas:
+
+```bash
+python3 -m unittest discover -s tests -v
+```
+
+Los dos tests de controles gráficos se omiten si no hay pantalla o Tkinter.
+En un entorno con Xvfb instalado pueden ejecutarse con
+`xvfb-run -a python3 -m unittest discover -s tests -v`.
+
+Selecciona entrada y salida distintas; elige un pasillo con los controles
+«Desde/Hacia» o haciendo clic en una flecha. Bloquea, restablece o agrega
+un arco y pulsa **Calcular / recalcular**. Cambia entre las cuatro vistas
+para inspeccionar los resultados. **Cargar escenario** reemplaza la red
+editada por G0, G1 o G2, conservando los extremos seleccionados.
+
+La tabla compara siempre los tres escenarios de referencia, no las ediciones
+libres de la red. El análisis y el guion de capturas están en
+[docs/escenarios.md](docs/escenarios.md).
 
 ## 10. Modo de trabajo y coordinación
 
@@ -190,14 +225,6 @@ El equipo trabaja de forma **modular y en paralelo** sobre contratos definidos, 
 - **Validación continua:** antes de hacer *merge*, ejecutar la suite de pruebas (`python3 -m unittest discover -s tests -v`) y contrastar contra los escenarios de referencia (`docs/escenarios.md` y `docs/caso_manual.md`).
 - **Implementación propia:** los algoritmos se programan desde cero en Python 3 (sin librerías externas que resuelvan camino mínimo, flujo máximo o corte mínimo); cualquier dependencia visual se declara en `requirements.txt`.
 
-## 11. Ejecución del proyecto
-
-> **Pendiente de completar una vez implementada la aplicación.** No se incluyen comandos ni dependencias ficticias.
-
-- Versión de Python utilizada: `Python 3.10+` (probado en `Python 3.14`).
-- Instalación de dependencias: `Sin dependencias externas por ahora (biblioteca estándar); pendiente definir librería de UI`.
-- Comando de inicio (verificación actual / futura UI): `python3 -m src.main`
-- Comando de pruebas: `python3 -m unittest discover -s tests -v`
 
 ---
 
