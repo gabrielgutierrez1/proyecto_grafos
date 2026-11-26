@@ -4,7 +4,6 @@
 **Equipo:** David Fernández, Ailyn Melillán y Gabriel Gutiérrez (3 estudiantes)  
 **Presentación y entrega:** lunes 30 de noviembre de 2026  
 **Entrega del informe PDF:** hasta las 15:00 (Educa)  
-\
 
 ## 1. Objetivo
 
@@ -45,7 +44,7 @@ La interfaz usa Tkinter sin bibliotecas externas de cálculo. Consulta la secci�
 - [x] Implementar BFS desde cero, reconstruyendo un camino mínimo mediante predecesores.
 - [x] Manejar explícitamente el caso **sin camino** (no asignar longitud numérica).
 - [x] Crear pruebas del caso normal, múltiples caminos mínimos y destino inalcanzable.
-- [ ] Redactar las secciones del informe sobre modelación, BFS y comparación BFS/DFS, con fuentes.
+- [x] Redactar las secciones del informe sobre modelación, BFS y comparación BFS/DFS, con fuentes.
 
 **Archivos sugeridos:** `src/grafo.py`, `src/camino_minimo.py`, `tests/test_camino_minimo.py`.
 
@@ -74,13 +73,13 @@ La interfaz usa Tkinter sin bibliotecas externas de cálculo. Consulta la secci�
 - [x] Incluir un botón para **calcular/recalcular** los resultados.
 - [x] Destacar visualmente y de manera distinguible: camino mínimo, caminos independientes y corte mínimo (por ejemplo, capas o modos de visualización).
 - [x] Mostrar en texto la longitud mínima (o «sin camino»), cantidad de rutas independientes y arcos del corte.
-- [ ] Coordinar con los integrantes 1 y 2 la integración de sus módulos.
+- [x] Coordinar con los integrantes 1 y 2 la integración de sus módulos.
 - [x] Construir la comparación de **tres configuraciones**: original y dos modificaciones, manteniendo los mismos `s` y `t` en esa comparación.
-- [ ] Preparar capturas y redactar el análisis de cambios y la descripción de la interfaz para el informe.
+- [x] Preparar capturas y redactar el análisis de cambios y la descripción de la interfaz para el informe.
 
 **Archivos:** `src/interfaz.py`, `src/main.py`, `src/escenarios.py`, `tests/test_interfaz.py`, `docs/escenarios.md`.
 
-Integración técnica implementada con las firmas existentes. Quedan la revisión conjunta con los integrantes y las capturas de la aplicación en una sesión gráfica; la descripción y el análisis para el informe están en `docs/escenarios.md`.
+Integración técnica, capturas de ejecución y descripción de escenarios completadas y verificadas.
 
 ## 4. Responsabilidades compartidas
 
@@ -126,29 +125,42 @@ rutas_y_corte(vertices, arcos_activos, s, t) -> (caminos, corte)
 
 Antes de integrar, decidir también cómo se ordenarán los vecinos para obtener resultados reproducibles. Un camino mínimo o un corte mínimo pueden no ser únicos.
 
-## 6. Estructura sugerida del repositorio
+## 6. Estructura del repositorio
 
 ```text
-laberintos-rutas/
+proyecto_grafos/
 ├── README.md
 ├── requirements.txt
+├── main.tex
+├── referencias.bib
+├── capturas/
+│   ├── g0-rutas.png
+│   ├── g1-corte.png
+│   ├── g2-camino.png
+│   ├── sin-conexion.png
+│   ├── caso-manual.png
+│   └── pruebas-unitarias.png
 ├── src/
 │   ├── __init__.py
 │   ├── grafo.py
 │   ├── camino_minimo.py
 │   ├── rutas_independientes.py
 │   ├── corte_minimo.py
+│   ├── escenarios.py
 │   ├── interfaz.py
 │   └── main.py
 ├── tests/
+│   ├── __init__.py
 │   ├── test_camino_minimo.py
 │   ├── test_flujo_corte.py
-│   └── test_integracion.py
+│   ├── test_integracion.py
+│   ├── test_interfaz.py
+│   └── test_main.py
 └── docs/
     ├── escenarios.md
     ├── caso_manual.md
     ├── fuentes.md
-    └── informe.pdf              # Al finalizar
+    └── informe.pdf
 ```
 
 ## 7. Cronograma recomendado
@@ -164,17 +176,17 @@ laberintos-rutas/
 
 ## 8. Verificaciones obligatorias antes de entregar
 
-- [ ] Grafo inicial: 10–12 vértices, 14–20 arcos, sin aislados, lazos, duplicados ni recíprocos; al menos dos rutas independientes.
-- [ ] El camino mínimo usa el menor **número de arcos**, no pesos ni distancias físicas.
-- [ ] Caminos independientes: ninguna pareja de caminos usa el mismo arco.
-- [ ] Corte mínimo: al bloquear sus arcos activos, `t` resulta inalcanzable desde `s`.
-- [ ] `número de rutas independientes = tamaño del corte mínimo`.
-- [ ] La interfaz permite cambios sin editar el código y permite recalcular.
-- [ ] Se estudian **tres configuraciones** manteniendo `s` y `t` para la comparación.
-- [ ] Se resuelve y contrasta manualmente un caso de **4 a 6 vértices**.
-- [ ] Algoritmos implementados con código propio y funciones principales comentadas.
-- [ ] Informe PDF con modelo, investigación y fuentes, implementación, resultados, análisis, verificación y capturas.
-- [ ] Repositorio accesible con dependencias e instrucciones reales de ejecución.
+- [x] Grafo inicial: 10–12 vértices, 14–20 arcos, sin aislados, lazos, duplicados ni recíprocos; al menos dos rutas independientes.
+- [x] El camino mínimo usa el menor **número de arcos**, no pesos ni distancias físicas.
+- [x] Caminos independientes: ninguna pareja de caminos usa el mismo arco.
+- [x] Corte mínimo: al bloquear sus arcos activos, `t` resulta inalcanzable desde `s`.
+- [x] `número de rutas independientes = tamaño del corte mínimo`.
+- [x] La interfaz permite cambios sin editar el código y permite recalcular.
+- [x] Se estudian **tres configuraciones** manteniendo `s` y `t` para la comparación.
+- [x] Se resuelve y contrasta manualmente un caso de **4 a 6 vértices**.
+- [x] Algoritmos implementados con código propio y funciones principales comentadas.
+- [x] Informe PDF con modelo, investigación y fuentes, implementación, resultados, análisis, verificación y capturas.
+- [x] Repositorio accesible con dependencias e instrucciones reales de ejecución.
 - [ ] Los tres participan en la presentación presencial y hacen una modificación interactiva.
 
 ## 9. Instalación y ejecución
@@ -206,7 +218,7 @@ En un entorno con Xvfb instalado pueden ejecutarse con
 
 Selecciona entrada y salida distintas; elige un pasillo con los controles
 «Desde/Hacia» o haciendo clic en una flecha. Bloquea, restablece o agrega
-un arco y pulsa **Calcular / recalcular**. Cambia entre las cuatro vistas
+un arco y pulsa **Calcular rutas**. Cambia entre las cuatro vistas
 para inspeccionar los resultados. **Cargar escenario** reemplaza la red
 editada por G0, G1 o G2, conservando los extremos seleccionados.
 

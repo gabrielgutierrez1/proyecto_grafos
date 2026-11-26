@@ -13,10 +13,20 @@ from .grafo import Arco, POSICIONES_SUGERIDAS, crear_grafo_inicial, ordenar_vert
 
 
 class InterfazLaberinto:
+    """Ventana principal interactiva del simulador sobre Tkinter, ttk y Canvas."""
+
     COLORES_RUTAS = ("#007f73", "#a45100", "#8054bd", "#1565c0", "#bd3972")
     MODOS = ("Red", "Camino mínimo", "Rutas independientes", "Corte mínimo")
 
     def __init__(self, raiz: tk.Tk) -> None:
+        """Construye los paneles, selectores, lienzo y pestañas sobre la raíz Tk.
+
+        Args:
+            raiz: Instancia raíz `tk.Tk` donde se aloja la interfaz.
+
+        Returns:
+            None.
+        """
         self.raiz = raiz
         self.grafo = crear_grafo_inicial()
         self.resultado: Resultado | None = None
@@ -189,6 +199,15 @@ class InterfazLaberinto:
         self.dibujar()
 
     def modificar(self, accion: str) -> None:
+        """Ejecuta una acción de edición sobre el pasillo seleccionado e invalida resultados.
+
+        Args:
+            accion: Nombre del método de `GrafoLaberinto` (`'bloquear_arco'`,
+                `'restablecer_arco'` o `'agregar_arco'`).
+
+        Returns:
+            None.
+        """
         try:
             getattr(self.grafo, accion)(self.origen.get(), self.destino.get())
         except ValueError as error:
@@ -197,15 +216,33 @@ class InterfazLaberinto:
         self._invalidar("Red modificada. Pulsa calcular.")
 
     def cargar_escenario(self) -> None:
+        """Reemplaza la red activa por el escenario seleccionado manteniendo los extremos.
+
+        Returns:
+            None.
+        """
         escenarios = dict(crear_escenarios(self.grafo.entrada, self.grafo.salida))
         self.grafo = escenarios[self.escenario.get()]
         self.calcular()
 
     @staticmethod
     def texto_corte(corte: set[Arco]) -> str:
+        """Formatea el conjunto de arcos del corte mínimo para su presentación visual.
+
+        Args:
+            corte: Conjunto de pares ordenados `(u, v)` pertenecientes al corte.
+
+        Returns:
+            str: Arcos separados por coma o `'∅'` cuando el corte es vacío.
+        """
         return ", ".join(f"{u} → {v}" for u, v in sorted(corte)) or "∅"
 
     def calcular(self) -> None:
+        """Recalcula indicadores, detalle de rutas, tabla comparativa y dibujo de la red.
+
+        Returns:
+            None.
+        """
         self.resultado = calcular_resultado(self.grafo)
         r = self.resultado
         self.metricas[0].set(str(r.longitud) if r.longitud is not None else "Sin camino")
@@ -292,6 +329,11 @@ class InterfazLaberinto:
 
 
 def iniciar_interfaz() -> None:
+    """Crea la ventana principal de Tkinter e inicia el bucle de eventos interactivo.
+
+    Returns:
+        None.
+    """
     raiz = tk.Tk()
     InterfazLaberinto(raiz)
     raiz.mainloop()

@@ -1,0 +1,728 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+\else
+  \usepackage{fontspec}
+\fi
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{geometry}
+\geometry{left=2.6cm,right=2.6cm,top=2.55cm,bottom=2.55cm}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs,tabularx,array,longtable,multirow}
+\usepackage{enumitem}
+\usepackage{graphicx,caption,subcaption}
+\usepackage{xcolor}
+\definecolor{azulFuerte}{HTML}{1E3A8A}
+\definecolor{azulBrillante}{HTML}{2563EB}
+\definecolor{moradoFuerte}{HTML}{6D28D9}
+\definecolor{moradoOscuro}{HTML}{4C1D95}
+\definecolor{fondoCodigo}{HTML}{F5F3FF}
+\definecolor{fondoNodo}{HTML}{EDE9FE}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit}
+\usepackage{float}
+\usepackage{listings}
+\lstset{
+  language=Python,
+  backgroundcolor=\color{fondoCodigo},
+  basicstyle=\ttfamily\small\color{black!90},
+  keywordstyle=\color{moradoFuerte}\bfseries,
+  commentstyle=\color{azulBrillante!80!black}\itshape,
+  stringstyle=\color{azulFuerte}\bfseries,
+  numberstyle=\tiny\color{moradoOscuro},
+  frame=single,
+  rulecolor=\color{moradoFuerte},
+  framerule=1.1pt,
+  breaklines=true,
+  columns=fullflexible,
+  showstringspaces=false,
+  keepspaces=true,
+  aboveskip=0.9em,
+  belowskip=0.9em
+}
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\color{moradoOscuro}}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries\color{azulFuerte}}{\thesubsection}{1em}{}
+
+\newcommand{\captura}[3]{%
+\begin{figure}[H]\centering
+\IfFileExists{capturas/#1}{\includegraphics[width=\linewidth,height=0.43\textheight,keepaspectratio]{capturas/#1}}{%
+\fbox{\begin{minipage}[c][3.8cm][c]{0.91\linewidth}\centering
+\textbf{Espacio reservado para captura real}\\[0.35em]
+\small #3\\[0.5em]
+\footnotesize\texttt{\detokenize{capturas/#1}}
+\end{minipage}}}
+\caption{#2}\end{figure}}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=moradoFuerte,
+  urlcolor=azulBrillante,
+  citecolor=azulFuerte,
+  pdftitle={Simulador interactivo de laberintos y rutas alternativas},
+  pdfauthor={David Fernández; Ailyn Melillán; Gabriel Gutiérrez}
+}
+\usepackage{csquotes}
+\renewcommand{\arraystretch}{1.2}
+\setlength{\parskip}{0.35em}
+\setlength{\parindent}{0pt}
+\makeatletter
+\renewcommand*\l@section{\@dottedtocline{1}{0em}{2.2em}}
+\makeatother
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\textcolor{moradoOscuro}{\textbf{INFO1158 --- Teoría de Grafos}}}
+\rhead{\textcolor{azulFuerte}{\textbf{Proyecto 1}}}
+\cfoot{\textcolor{moradoOscuro}{\textbf{\thepage}}}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{moradoFuerte}\leaders\hrule height \headrulewidth\hfill}}
+\setlength{\headheight}{14pt}
+\newcommand{\E}{\mathcal{E}}
+\newcommand{\V}{\mathcal{V}}
+\newcommand{\patharr}{\rightarrow}
+\tikzset{
+  vertex/.style={
+    circle,
+    draw=moradoOscuro,
+    very thick,
+    fill=fondoNodo,
+    text=moradoOscuro,
+    minimum size=8.5mm,
+    inner sep=0pt,
+    font=\small\bfseries
+  },
+  arc/.style={
+    -{Latex[length=2.7mm]},
+    line width=0.95pt,
+    draw=azulFuerte
+  },
+  edit/.style={
+    -{Latex[length=2.8mm]},
+    line width=1.8pt,
+    draw=moradoFuerte
+  },
+  disabled/.style={
+    -{Latex[length=2.8mm]},
+    line width=1.6pt,
+    densely dashed,
+    draw=red!80!black
+  }
+}
+\newtheorem{proposition}{Proposición}
+\newtheorem{observation}{Observación}
+
+\begin{document}
+
+\pagenumbering{gobble}
+\begin{titlepage}
+\centering
+\vspace*{1.3cm}
+{\large Universidad Católica de Temuco\\[0.35cm] Asignatura: Teoría de Grafos --- INFO1158\par}
+\vspace{2.2cm}
+{\Huge\bfseries Proyecto 1\par}
+\vspace{0.5cm}
+{\LARGE\bfseries Simulador interactivo de laberintos\\ y rutas alternativas\par}
+\vspace{0.65cm}
+{\large Informe técnico\par}
+\vfill
+\begin{tabular}{rl}
+\textbf{Integrantes:} & David Fernández \\
+& Ailyn Melillán \\
+& Gabriel Gutiérrez \\
+\textbf{Fecha del informe:} & 26 de noviembre de 2026 \\
+\textbf{Lenguaje de desarrollo:} & Python 3 \\
+\end{tabular}
+\vspace{2.0cm}
+\end{titlepage}
+\pagenumbering{roman}
+\section*{Resumen}
+Este informe presenta el diseño, la implementación y la verificación de un simulador interactivo de laberintos representados mediante grafos dirigidos. La aplicación resuelve tres problemas: encontrar un camino con el menor número de arcos, determinar el máximo número de rutas dirigidas sin arcos compartidos e identificar un conjunto mínimo de pasillos cuyo bloqueo desconecta la entrada de la salida. Se implementó búsqueda en anchura (BFS) y flujo máximo de capacidad unitaria mediante Edmonds--Karp, con reconstrucción de rutas y extracción de un corte a partir de la red residual. El programa utiliza Python y una interfaz de escritorio desarrollada con Tkinter, ttk y Canvas. La red inicial consta de diez vértices y dieciocho arcos. Se analizan dos modificaciones independientes: bloquear $(H,t)$ reduce de tres a dos las rutas independientes sin cambiar la distancia mínima, mientras que agregar $(A,t)$ reduce dicha distancia de tres a dos y conserva tres rutas. Se contrasta un caso manual de cinco vértices con los algoritmos, se valida la suite completa de 18 pruebas automatizadas y se documentan con capturas reales de ejecución las configuraciones del simulador.
+
+\textbf{Palabras clave:} grafos dirigidos; búsqueda en anchura; caminos disjuntos por arcos; flujo máximo; corte mínimo; simulación.
+\tableofcontents
+\clearpage
+\pagenumbering{arabic}
+
+\section{Introducción}
+Un centro de almacenamiento puede modelar los desplazamientos permitidos de un robot mediante una red de intersecciones y pasillos unidireccionales. Dado que recorrer un arco equivale a utilizar un pasillo, la longitud de una ruta se expresa en cantidad de arcos y no en distancia geométrica. Esta elección transforma la navegación en un problema de caminos en grafos dirigidos \cite{kleinberg2006,sedgewick2011}.
+
+Además de identificar una ruta corta, es necesario conocer la redundancia de la red. Dos caminos diferentes no necesariamente representan alternativas independientes: podrían coincidir en uno o más pasillos. En cambio, los caminos disjuntos por arcos permiten describir alternativas que no dependen de una misma conexión. La formulación con flujo máximo y corte mínimo proporciona un fundamento matemático para cuantificar esta independencia y los bloqueos necesarios para eliminar la conexión entre dos extremos \cite{ford1956,kleinberg2006}.
+
+El objetivo de este informe es establecer un modelo reproducible, fundamentar las elecciones algorítmicas con fuentes académicas y analizar configuraciones concretas. Las propiedades de los ejemplos se justifican mediante caminos y cortes explícitos y se contrastan con los resultados de los algoritmos implementados. Se describe además la interfaz, su integración con el modelo y los procedimientos de verificación.
+
+\section{Planteamiento del problema y objetivos}
+\subsection{Planteamiento}
+Se considera un laberinto compuesto por espacios y pasillos de circulación en un solo sentido. El usuario elige una entrada $s$ y una salida $t$, con $s\ne t$, y requiere responder tres preguntas:
+\begin{enumerate}[label=\arabic*)]
+\item ¿Cuál es el menor número de pasillos necesarios para alcanzar $t$ desde $s$?
+\item ¿Cuántas rutas dirigidas pueden utilizarse sin compartir ningún pasillo entre ellas?
+\item ¿Qué conjunto más pequeño de pasillos debe bloquearse para impedir el acceso desde $s$ hasta $t$?
+\end{enumerate}
+El modelo debe permitir bloquear y restablecer arcos, agregar arcos válidos y cambiar interactiva e independientemente la entrada y la salida. Para comparar escenarios, los extremos se mantendrán fijos en $s$ y $t$.
+
+\subsection{Objetivo general}
+Diseñar, implementar y documentar un simulador interactivo en Python que represente un laberinto como grafo dirigido y analice caminos mínimos, alternativas sin arcos compartidos y cortes mínimos ante modificaciones de su red.
+
+\subsection{Objetivos específicos}
+\begin{itemize}[leftmargin=1.7em]
+\item Definir un grafo inicial que satisfaga las restricciones formales de vértices, arcos y conectividad solicitadas.
+\item Comparar BFS y DFS y fundamentar un método que encuentre un camino con la menor cantidad de arcos.
+\item Comparar búsqueda directa de rutas disjuntas y flujo máximo, seleccionando un procedimiento exacto.
+\item Identificar rutas independientes y un conjunto mínimo de arcos que desconecte $s$ de $t$.
+\item Analizar una red inicial y dos modificaciones mediante indicadores equivalentes.
+\item Verificar los resultados en un caso pequeño resuelto manualmente y en el grafo principal.
+\item Implementar una interfaz que permita modificar la red, seleccionar los extremos, recalcular y visualizar los resultados, aplicando las restricciones del modelo.
+\end{itemize}
+
+\section{Fundamentos teóricos}
+\subsection{Grafo dirigido, caminos y longitud}
+Un grafo dirigido es un par $G=(V,E)$, donde $V$ es el conjunto finito de vértices y $E\subseteq V\times V$ es el conjunto de arcos. Cada $(u,v)\in E$ permite el desplazamiento desde $u$ hasta $v$, pero no implica la existencia de $(v,u)$. Una ruta dirigida de $s$ a $t$ es una sucesión de vértices $P=(s=v_0,v_1,\ldots,v_k=t)$ tal que $(v_i,v_{i+1})\in E$ para $0\leq i<k$. En este trabajo, \emph{camino} denota una ruta sin repetición de vértices y su longitud es $\ell(P)=k$ \cite{kleinberg2006,sedgewick2011}.
+
+La distancia en número de arcos se define como
+\begin{equation}\label{eq:distancia}
+d_G(s,t)=\min\{\ell(P):P\text{ es un camino dirigido de }s\text{ a }t\}.
+\end{equation}
+Si no existe camino, la aplicación debe informar \enquote{sin camino}: no se interpreta un número como longitud de una ruta inexistente.
+
+\subsection{Caminos disjuntos por arcos}
+Para un camino dirigido $P$, sea $E(P)$ su conjunto de arcos. Dos caminos $P_i$ y $P_j$ son \emph{disjuntos por arcos} cuando
+\begin{equation}\label{eq:disjuntos}
+E(P_i)\cap E(P_j)=\varnothing\qquad (i\ne j).
+\end{equation}
+Pueden compartir vértices intermedios. Denotaremos por $\lambda_G(s,t)$ la máxima cantidad de caminos de $s$ a $t$ que cumplen esta condición entre sí. Es un problema de conectividad por arcos, diferente al de caminos disjuntos por vértices \cite{kleinberg2006}.
+
+\subsection{Flujos y cortes}
+Al asociar capacidad unitaria $c(u,v)=1$ a cada arco, un flujo $f$ respeta restricciones de capacidad y conservación en los vértices que no son $s$ ni $t$. Su valor es el flujo neto que sale de $s$. Un corte $s$--$t$ es una partición $(S,V\setminus S)$ con $s\in S$ y $t\notin S$; su capacidad se calcula sumando las capacidades de los arcos que salen de $S$. El teorema de flujo máximo--corte mínimo establece que el máximo valor del flujo coincide con la capacidad mínima de un corte \cite{ford1956,kleinberg2006,sedgewick2011}.
+
+En redes con capacidades enteras, puede obtenerse un flujo máximo integral. Para capacidades unitarias, sus unidades se pueden descomponer en caminos dirigidos que no comparten arcos (eventualmente descartando componentes cíclicas del flujo). Así, en este proyecto,
+\begin{equation}\label{eq:minmax}
+\boxed{\lambda_G(s,t)=\min\{|C|:C\subseteq E,\ t\text{ no es alcanzable desde }s\text{ en }G-C\}.}
+\end{equation}
+La expresión es la especialización al caso unitario del principio de flujo máximo--corte mínimo, compatible con la versión por arcos del teorema de Menger \cite{ford1956,kleinberg2006}.
+
+\section{Modelación matemática del laberinto}
+\subsection{Conjuntos de vértices y arcos}
+Se implementó una red principal con los siguientes diez vértices:
+\begin{equation}
+V=\{s,A,B,C,D,E,F,G,H,t\}, \qquad |V|=10.
+\end{equation}
+La entrada es $s$ y la salida es $t$. El conjunto de dieciocho arcos iniciales es
+\begin{align}
+E=\{&(s,A),(s,B),(s,C),\\
+&(A,D),(A,E),\\
+&(B,D),(B,E),(B,F),\\
+&(C,E),(C,F),\\
+&(D,G),(D,H),(E,G),(E,H),\\
+&(F,H),(F,t),(G,t),(H,t)\}, \quad |E|=18.
+\end{align}
+Los vértices representan espacios o intersecciones y los arcos representan pasillos dirigidos. Se interpreta cada arco activo como una conexión de capacidad unitaria. Las coordenadas del dibujo solamente facilitan la visualización y no determinan la longitud de los caminos.
+
+\subsection{Representación gráfica}
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[x=1.05cm,y=0.9cm]
+\node[vertex] (s) at (0,2) {$s$};
+\node[vertex] (A) at (2,4) {A};
+\node[vertex] (B) at (2,2) {B};
+\node[vertex] (C) at (2,0) {C};
+\node[vertex] (D) at (4.4,4) {D};
+\node[vertex] (E) at (4.4,2) {E};
+\node[vertex] (F) at (4.4,0) {F};
+\node[vertex] (G) at (6.9,3.2) {G};
+\node[vertex] (H) at (6.9,0.8) {H};
+\node[vertex] (t) at (9.4,2) {$t$};
+\foreach \u/\v in {s/A,s/B,s/C,A/D,A/E,B/D,B/E,B/F,C/E,C/F,D/G,D/H,E/G,E/H,F/H,G/t,H/t} {
+ \draw[arc] (\u) -- (\v);
+}
+% El arco directo F -> t rodea H para evitar que parezca pasar por ese vertice.
+% Los dos arcos F -> H y F -> t son conexiones distintas del modelo.
+\draw[arc] (F.south east) .. controls (5.7,-1.0) and (8.45,-0.85) .. (t.south);
+\end{tikzpicture}}
+\caption{Grafo dirigido implementado para el escenario inicial. El arco directo $F\to t$ se dibuja curvo para distinguirlo de la ruta $F\to H\to t$. Cada flecha representa un pasillo de sentido único. Elaboración propia.}
+\label{fig:principal}
+\end{figure}
+\textbf{Nota sobre la figura:} las intersecciones de líneas del dibujo que no tengan un nodo identificado no representan un vértice nuevo.
+
+\subsection{Lista de adyacencia}
+\begin{table}[H]
+\centering
+\caption{Adyacencia saliente del grafo inicial (elaboración propia).}
+\begin{tabular}{cc@{\hspace{1.1cm}}cc}
+\toprule
+Vértice & Vecinos alcanzables & Vértice & Vecinos alcanzables \\
+\midrule
+$s$ & $A,B,C$ & $D$ & $G,H$ \\
+$A$ & $D,E$ & $E$ & $G,H$ \\
+$B$ & $D,E,F$ & $F$ & $H,t$ \\
+$C$ & $E,F$ & $G$ & $t$ \\
+$H$ & $t$ & $t$ & $\varnothing$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Verificación de las restricciones iniciales}
+La red inicial satisface $10\leq |V|\leq 12$ y $14\leq |E|\leq20$. Se tiene $s\ne t$, no existen lazos $(v,v)$, no se repiten arcos y no hay parejas recíprocas $(u,v),(v,u)$. Todos los vértices son incidentes al menos a un arco; por tanto, ninguno es aislado. Por ejemplo, la siguiente familia de caminos muestra que hay \emph{al menos} dos rutas sin arcos compartidos:
+\begin{align*}
+P_1&:s\to B\to F\to t,\\
+P_2&:s\to A\to D\to G\to t,\\
+P_3&:s\to C\to E\to H\to t.
+\end{align*}
+Estas tres rutas no comparten ningún arco. Como desde $s$ salen exactamente tres arcos, el número máximo no puede superar tres: $\lambda_G(s,t)\leq3$. Al exhibirse tres rutas independientes se concluye $\lambda_G(s,t)=3$.
+
+\section{Investigación y selección de algoritmos}
+\subsection{Comparación: BFS frente a DFS}
+La búsqueda en anchura (\emph{breadth-first search}, BFS) recorre el grafo por niveles de distancia desde el origen. Para grafos no ponderados, el primer descubrimiento de un vértice determina su distancia mínima en número de arcos; el almacenamiento de predecesores permite reconstruir un camino mínimo. La búsqueda en profundidad (\emph{depth-first search}, DFS) explora una rama antes de retroceder; permite verificar alcanzabilidad, pero la primera ruta que encuentra no tiene por qué minimizar la cantidad de arcos \cite{kleinberg2006,sedgewick2011,mit2011}.
+
+\begin{table}[H]
+\centering
+\caption{Comparación de métodos de exploración.}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.3cm}XX}
+\toprule
+Criterio & BFS & DFS \\
+\midrule
+Estructura habitual & Cola FIFO & Pila o recursión \\
+Orden de exploración & Niveles desde el origen & Profundización de una rama \\
+Camino mínimo por número de arcos & Sí, en grafos sin ponderaciones & No lo garantiza en su forma básica \\
+Complejidad con listas de adyacencia & $O(|V|+|E|)$ & $O(|V|+|E|)$ \\
+Utilidad en el proyecto & Localizar ruta mínima y reconstruirla & Explorar y verificar conectividad \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Elección.} Se selecciona BFS porque el enunciado define la distancia exclusivamente por el número de arcos. No es necesario aplicar Dijkstra ni introducir pesos, ya que todos los pasillos cuentan como una unidad de recorrido \cite{kleinberg2006}.
+
+\subsection{Procedimiento de camino mínimo}
+El algoritmo implementado por el equipo sigue el procedimiento siguiente:
+\begin{enumerate}[label=\arabic*.]
+\item Construir las listas de vecinos salientes usando únicamente arcos activos.
+\item Inicializar una cola con $s$ y registrar $\operatorname{prev}[s]=\text{nulo}$.
+\item Extraer un vértice $u$ de la cola; para cada arco activo $(u,v)$, descubrir $v$ si todavía no ha sido visitado, registrar $\operatorname{prev}[v]=u$ e incorporarlo a la cola.
+\item Detenerse al descubrir o procesar $t$, o cuando la cola quede vacía.
+\item Si $t$ no fue visitado, devolver \enquote{sin camino}. Si fue visitado, seguir los predecesores desde $t$ hasta $s$, invertir la secuencia y calcular el número de arcos como longitud de la lista menos uno.
+\end{enumerate}
+La elección concreta entre caminos mínimos empatados dependerá del orden de recorrido de los vecinos; el programa fija un orden determinista para obtener resultados reproducibles. El recorrido BFS tiene complejidad temporal $O(|V|+|E|)$ con listas de adyacencia \cite{kleinberg2006,sedgewick2011}.
+
+\subsection{Comparación de enfoques para rutas sin arcos compartidos}
+Un primer enfoque consiste en enumerar todos los caminos dirigidos simples de $s$ a $t$ y buscar una subfamilia máxima cuyos conjuntos de arcos sean disjuntos. Este planteamiento ofrece una descripción directa de la condición, pero el número de caminos simples puede crecer exponencialmente con el tamaño del grafo; la selección entre subfamilias introduce un costo combinatorio adicional.
+
+Un segundo enfoque modela cada arco como una conexión de capacidad uno y obtiene un flujo máximo. La integridad del flujo permite recuperar una familia de caminos disjuntos por arcos y la red residual proporciona información para localizar un corte mínimo. Este enfoque evita enumerar explícitamente todas las combinaciones de caminos \cite{ford1956,edmonds1972,kleinberg2006}.
+
+\begin{table}[H]
+\centering
+\caption{Comparación de estrategias para rutas independientes.}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.8cm}XX}
+\toprule
+Criterio & Enumeración y selección & Flujo máximo unitario \\
+\midrule
+Idea & Generar rutas simples y escoger una subfamilia disjunta & Encontrar flujo integral en la red con capacidad 1 \\
+Ventaja & Formulación directa de la condición & Solución exacta y corte mínimo derivable \\
+Limitación & Potencial crecimiento exponencial de rutas & Necesita red residual y reconstrucción de rutas \\
+Selección & Referencia conceptual & \textbf{Estrategia seleccionada} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Edmonds--Karp y reconstrucción de las rutas}
+Se implementó la variante Edmonds--Karp del método de caminos aumentantes: en cada iteración se busca con BFS un camino desde $s$ hasta $t$ que posea capacidad residual positiva, y se incrementa el flujo en el mínimo valor residual de dicho camino. El método termina cuando no existe un nuevo camino aumentante \cite{edmonds1972}. Las aristas residuales inversas son indispensables, pues permiten cancelar o redirigir asignaciones de flujo realizadas antes; \emph{no} equivalen a añadir pasillos físicos recíprocos al laberinto.
+
+La complejidad general del algoritmo Edmonds--Karp es $O(|V|\,|E|^2)$ \cite{edmonds1972,kleinberg2006}. Con capacidades unitarias, los aumentos y el flujo obtenido son enteros. Para presentar las rutas, se inspeccionan los arcos originales que transportan flujo positivo y se extraen caminos $s$--$t$; cuando corresponda, los ciclos de flujo se descartan. No se deben mostrar conexiones inversas de la red residual como pasillos del laberinto.
+
+\subsection{Determinación del corte mínimo}
+Al finalizar Edmonds--Karp, sea $S$ el conjunto de vértices alcanzables desde $s$ siguiendo arcos con capacidad residual positiva. Si $t$ no pertenece a $S$, el conjunto
+\begin{equation}\label{eq:cut}
+C=\{(u,v)\in E_{\mathrm{activo}}:u\in S,\;v\notin S\}
+\end{equation}
+es un corte mínimo. Con capacidad unitaria, $|C|$ coincide con el valor del flujo máximo y con el número máximo de caminos dirigidos sin arcos compartidos \cite{ford1956,kleinberg2006}.
+
+\begin{proposition}
+Sea $\mathcal{P}=\{P_1,\ldots,P_k\}$ una familia de caminos dirigidos disjuntos por arcos y $C$ un conjunto de arcos cuya eliminación desconecta $s$ de $t$. Entonces $k\leq |C|$.
+\end{proposition}
+\begin{proof}
+Cada camino $P_i$ debe contener al menos un arco de $C$, porque de otro modo continuaría conectando $s$ con $t$ después del bloqueo. Como los caminos no comparten arcos, los arcos elegidos de $C$ son distintos para cada $P_i$. Por tanto, $C$ contiene al menos $k$ arcos.
+\end{proof}
+Esta cota permite certificar la optimalidad cuando se exhiben $k$ caminos independientes y un corte que utiliza exactamente $k$ arcos.
+
+\section{Implementación del simulador e interfaz}
+\subsection{Tecnología y estructura modular}
+El programa se implementó en Python y requiere la versión 3.10 o superior. Los fragmentos de código de esta sección se extrajeron de los módulos integrados, ajustando la sangría o los saltos de línea cuando fue necesario para su presentación. Utiliza exclusivamente la biblioteca estándar para los cálculos: \texttt{collections.deque} para las colas FIFO, conjuntos para los vértices y arcos, y diccionarios para la adyacencia, predecesores y red residual. La interfaz de escritorio utiliza Tkinter, los controles temáticos de \texttt{ttk} y un \texttt{Canvas} para dibujar la red. Estas herramientas se emplean para presentación y estructuras básicas, no para resolver los algoritmos de teoría de grafos. No se requieren paquetes de \texttt{pip}; Tk debe estar instalado en el sistema.
+
+La organización modular evita duplicar cálculos y separa el modelo matemático de la representación visual. La Tabla~\ref{tab:modulos} resume los archivos principales de la versión integrada.
+\begin{table}[H]
+\centering\small
+\caption{Organización del código fuente y responsabilidades.}\label{tab:modulos}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.5cm}X}
+\toprule
+Archivo & Responsabilidad \\
+\midrule
+\texttt{grafo.py} & Define las redes inicial y manual; gestiona arcos, extremos y validaciones.\\
+\texttt{camino\_minimo.py} & BFS, reconstrucción por predecesores y formato del resultado.\\
+\texttt{rutas\_independientes.py} & Edmonds--Karp y extracción de caminos sobre el flujo final.\\
+\texttt{corte\_minimo.py} & Alcanzabilidad residual, corte mínimo y función conjunta de rutas y corte.\\
+\texttt{escenarios.py} & Integra los algoritmos y construye G0, G1 y G2.\\
+\texttt{interfaz.py} & Controles, dibujo, edición de pasillos, indicadores y comparación.\\
+\texttt{main.py} & Punto de entrada gráfico y modo de verificación por consola.\\
+\texttt{tests/} & Pruebas unitarias, integración, controles gráficos e inicio del programa.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=7mm and 8mm, every node/.style={font=\small}, modulo/.style={draw=blue!50!black,rounded corners=2pt,fill=blue!4,align=center,minimum height=9mm,text width=4.15cm}, arr/.style={-{Latex[length=2mm]},thick,draw=black!70}]
+\node[modulo] (main) {\texttt{main.py}\\Inicio gráfico / consola};
+\node[modulo,below=of main] (ui) {\texttt{interfaz.py}\\Interacción y visualización};
+\node[modulo,below=of ui] (esc) {\texttt{escenarios.py}\\Integración de resultados};
+\node[modulo,below left=9mm and 1mm of esc] (bfs) {\texttt{camino\_minimo.py}\\BFS};
+\node[modulo,below right=9mm and 1mm of esc] (cut) {\texttt{corte\_minimo.py}\\Rutas y corte};
+\node[modulo,below=of cut] (flow) {{\footnotesize\texttt{rutas\_independientes.py}}\\Edmonds--Karp y extracción};
+\node[modulo,left=8mm of flow] (g) {\texttt{grafo.py}\\Modelo y arcos activos};
+\draw[arr] (main)--(ui);\draw[arr] (ui)--(esc);\draw[arr] (esc)--(bfs);\draw[arr] (esc)--(cut);\draw[arr] (cut)--(flow);\draw[arr] (bfs)--(g);\draw[arr] (esc.south)--(g.north);
+\end{tikzpicture}
+\caption{Esquema funcional de integración. Las flechas indican uso de módulos o transferencia de datos; la interfaz no calcula los algoritmos por su cuenta. Elaboración propia.}
+\end{figure}
+
+\subsection{Modelo de datos y control de modificaciones}
+La clase \texttt{GrafoLaberinto} administra los conjuntos \texttt{vertices}, \texttt{arcos} y \texttt{bloqueados}, así como los atributos \texttt{entrada} y \texttt{salida}. Los arcos se representan mediante tuplas ordenadas $(u,v)$; invertir los extremos cambia la dirección. Los conjuntos previenen duplicación en el almacenamiento, y la validación explícita rechaza lazos, arcos repetidos y recíprocos, además de extremos inexistentes. En la configuración inicial se comprueban las cardinalidades y la ausencia de vértices aislados. La existencia de al menos dos rutas independientes para la red definida se certifica en la sección de modelación y en las pruebas.
+
+Sea $B$ el conjunto de pasillos bloqueados. La red utilizada por los algoritmos es $E_{\mathrm{activo}}=E\setminus B$. Un pasillo bloqueado permanece en el modelo y puede recuperarse sin volver a crearlo. El código siguiente es un extracto de \texttt{src/grafo.py}:
+\begin{lstlisting}[language=Python]
+@property
+def arcos_activos(self) -> set[Arco]:
+    return self.arcos - self.bloqueados
+
+def agregar_arco(self, u: str, v: str) -> None:
+    validar_nuevo_arco(self.vertices, self.arcos, u, v)
+    self.arcos.add((u, v))
+\end{lstlisting}
+Los métodos \texttt{bloquear\_arco} y \texttt{restablecer\_arco} agregan y retiran, respectivamente, el par del conjunto de bloqueados. Ambos verifican que el arco exista. La función \texttt{cambiar\_extremos} exige dos vértices válidos y distintos. La lista de adyacencia saliente se construye con los arcos activos y se ordena para que el algoritmo sea reproducible en caso de empate.
+
+\subsection{Implementación del camino mínimo}
+La función \texttt{camino\_minimo(vertices, arcos\_activos, s, t)} devuelve la pareja \texttt{(camino, longitud)}. El camino es una lista ordenada de vértices, y su longitud es la cantidad de arcos. Cuando no existe conexión, retorna \texttt{(None, None)}. Si los extremos no son válidos o coinciden, genera una excepción \texttt{ValueError}; la interfaz evita ese estado mediante el modelo.
+
+El núcleo de BFS, extraído de \texttt{src/camino\_minimo.py}, es:
+\begin{lstlisting}
+cola: deque[str] = deque([s])
+predecesor: dict[str, str | None] = {s: None}
+
+while cola:
+    u = cola.popleft()
+
+    for v in adyacencia[u]:
+        if v not in predecesor:
+            predecesor[v] = u
+            if v == t:
+                camino = _reconstruir_camino(predecesor, t)
+                return camino, len(camino) - 1
+            cola.append(v)
+
+return None, None
+\end{lstlisting}
+El diccionario \texttt{predecesor} tiene una doble función: indica cuáles vértices fueron descubiertos y registra el arco por el cual se alcanzaron por primera vez. La cola permite procesarlos en orden de distancia no decreciente. La función auxiliar \texttt{\_reconstruir\_camino} sigue los predecesores desde $t$ hasta $s$, invierte la lista y entrega el recorrido en su dirección real. No se agrega $t$ a la cola, porque el algoritmo retorna en el primer descubrimiento del destino.
+
+\begin{table}[H]
+\centering\small
+\caption{Traza de BFS para la configuración inicial, con el orden de vecinos del código.}
+\begin{tabularx}{\textwidth}{l l l X}
+\toprule
+Paso & Extraído & Descubiertos & Cola después del paso \\
+\midrule
+0 & -- & $s$ & $[s]$\\
+1 & $s$ & $A,B,C$ & $[A,B,C]$\\
+2 & $A$ & $D,E$ & $[B,C,D,E]$\\
+3 & $B$ & $F$ & $[C,D,E,F]$\\
+4 & $C$ & -- & $[D,E,F]$\\
+5 & $D$ & $G,H$ & $[E,F,G,H]$\\
+6 & $E$ & -- & $[F,G,H]$\\
+7 & $F$ & $t$ & Retorno inmediato; $G,H$ quedan en cola.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+En el paso final se registran $\operatorname{prev}(t)=F$, $\operatorname{prev}(F)=B$ y $\operatorname{prev}(B)=s$. Al invertir la cadena resulta $s\to B\to F\to t$, de longitud tres. El recorrido BFS propiamente dicho ocupa tiempo $O(|V|+|E_{\mathrm{activo}}|)$ y espacio auxiliar $O(|V|)$, además de almacenar la adyacencia. En esta implementación la construcción de las listas ordenadas añade el costo de ordenar los vecinos, de hasta $O(|E_{\mathrm{activo}}|\log |V|)$ en el peor caso; este costo de preparación se distingue de la búsqueda estándar.
+
+\subsection{Implementación del flujo máximo y rutas independientes}
+\texttt{edmonds\_karp\_unitario} recibe los vértices, arcos activos y extremos y devuelve \texttt{(flujo\_max, flujo\_arcos, residual)}. Para cada arco real asigna capacidad residual inicial uno en el sentido original y cero en el inverso. No incorpora estas conexiones inversas al conjunto de pasillos del modelo. La ausencia de arcos recíprocos en la red original permite interpretar directamente la capacidad residual de cada arco original.
+
+La búsqueda de caminos aumentantes se realiza por BFS sobre vecinos cuya capacidad residual es positiva. En cada iteración exitosa se incrementa el flujo en una unidad, puesto que las capacidades son unitarias. El siguiente extracto de \texttt{src/rutas\_independientes.py} muestra la terminación y la actualización del flujo:
+\begin{lstlisting}
+if t not in padre:
+    break
+
+flujo_max += 1
+v = t
+while v != s:
+    u = padre[v]
+    residual[u][v] -= 1
+    residual[v][u] += 1
+    v = u
+\end{lstlisting}
+Al disminuir la capacidad del arco utilizado, se registra su ocupación; al incrementar la capacidad inversa, se habilita la cancelación de una asignación previa si otra combinación de rutas lo requiere. Si BFS no alcanza $t$, no existe camino aumentante y el flujo es máximo. En la red original, el valor final es tres.
+
+Para mostrar las rutas reales no basta con conservar los caminos aumentantes intermedios: estos pueden contener arcos residuales inversos. Por eso se construye \texttt{flujo\_arcos} con los arcos originales de capacidad residual cero, que transportan flujo unitario. \texttt{reconstruir\_caminos} realiza búsquedas BFS sobre esos arcos, recupera un camino por predecesores, elimina sus arcos del grafo de flujo auxiliar y continúa hasta extraer el número de rutas indicado por el flujo máximo. La operación que garantiza que no se reutilicen los arcos es:
+\begin{lstlisting}
+for i in range(len(camino) - 1):
+    u, v = camino[i], camino[i + 1]
+    grafo_flujo[u].remove(v)
+
+caminos.append(camino)
+\end{lstlisting}
+La extracción no elimina vértices: dos caminos pueden atravesar una misma intersección si utilizan arcos distintos. Los posibles ciclos de flujo no son presentados como rutas $s$--$t$. La cota general de Edmonds--Karp es $O(|V||E|^2)$; en esta red unitaria se efectúa como máximo una búsqueda aumentante exitosa por unidad de flujo, más una búsqueda final sin éxito. El costo adicional de la preparación ordenada y de la extracción se debe considerar al analizar la implementación completa.
+
+Cabe señalar que \texttt{src/rutas\_independientes.py} (y por extensión \texttt{src/corte\_minimo.py}) define una función auxiliar \texttt{\_clave\_orden} basada en \texttt{(str(type(v)), str(v))}, distinta de la ordenación de vértices de \texttt{src/grafo.py} que prioriza \texttt{s}, luego los intermedios y finalmente \texttt{t}. Esta clave genérica permite ordenar de forma determinista cualquier conjunto de etiquetas ---incluidas las usadas en pruebas unitarias--- sin modificar la validez del flujo máximo, el número de caminos disjuntos ni la cardinalidad del corte mínimo.
+
+\subsection{Implementación del corte mínimo}
+En \texttt{src/corte\_minimo.py}, la función \texttt{obtener\_corte\_minimo} recorre la red residual desde $s$, siguiendo solo conexiones con capacidad positiva, para determinar el conjunto \texttt{alcanzables}. En el estado final del flujo, $t$ no pertenece a este conjunto. Después examina los arcos activos originales y selecciona los que cruzan desde el lado alcanzable hacia su complemento:
+\begin{lstlisting}
+corte = {
+    (u, v)
+    for (u, v) in arcos_activos
+    if u in conjunto_vertices
+    and v in conjunto_vertices
+    and u in alcanzables
+    and v not in alcanzables
+}
+return corte
+\end{lstlisting}
+Este criterio implementa la Ecuación~\ref{eq:cut}. Los arcos en el sentido contrario no pertenecen a ese corte dirigido. Con capacidad unitaria, su cardinalidad debe coincidir con el número máximo de rutas. La función \texttt{rutas\_y\_corte} reúne el cálculo del flujo, la extracción de caminos y el corte residual. Si el flujo máximo es cero retorna \texttt{([], set())}, sin inventar una ruta ni un bloqueo necesario.
+
+\subsection{Integración y recálculo de resultados}
+El archivo \texttt{src/escenarios.py} define la clase de datos \texttt{Resultado}, que contiene cuatro atributos: \texttt{camino}, \texttt{longitud}, \texttt{rutas} y \texttt{corte}. La interfaz consume esa estructura sin repetir los procedimientos matemáticos. El siguiente código corresponde a la función de integración:
+\begin{lstlisting}
+def calcular_resultado(grafo: GrafoLaberinto) -> Resultado:
+    activos = grafo.arcos_activos
+    camino, longitud = camino_minimo(
+        grafo.vertices, activos, grafo.entrada, grafo.salida)
+    rutas, corte = rutas_y_corte(
+        grafo.vertices, activos, grafo.entrada, grafo.salida)
+    return Resultado(camino, longitud, rutas, corte)
+\end{lstlisting}
+Se utiliza la misma instantánea de arcos activos y los mismos extremos en ambas llamadas. Tras editar el grafo, la interfaz invalida el resultado anterior, sustituye los indicadores por guiones y solicita un nuevo cálculo. Esto impide representar una ruta que haya dejado de existir después de bloquear un pasillo. La operación \texttt{crear\_escenarios} genera tres objetos de grafo independientes, asigna los mismos extremos y aplica las modificaciones por separado. Cargar un escenario reemplaza la red editable conservando la entrada y salida elegidas; no acumula las modificaciones de G1 y G2.
+
+\subsection{Funcionalidades de la interfaz gráfica}
+La clase \texttt{InterfazLaberinto} organiza la ventana en un panel lateral de controles, tres indicadores principales, un área gráfica y dos pestañas de información. En el panel lateral se seleccionan los extremos del recorrido y los del pasillo que se desea modificar; también es posible seleccionar un arco mediante un clic sobre su flecha. Los botones se habilitan según el estado del pasillo elegido: activo, bloqueado, disponible para agregar o no permitido. Las validaciones del modelo se presentan mediante mensajes de error cuando corresponde.
+
+\begin{table}[H]
+\centering\small
+\caption{Operaciones disponibles para el usuario.}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.1cm}X}
+\toprule
+Funcionalidad & Comportamiento \\
+\midrule
+Elegir entrada y salida & Permite seleccionar vértices distintos mediante listas desplegables.\\
+Bloquear pasillo & Excluye el arco de los cálculos sin eliminarlo del dibujo.\\
+Restablecer pasillo & Reactiva un arco previamente bloqueado.\\
+Agregar nuevo arco & Valida los extremos y rechaza lazos, repetidos y recíprocos.\\
+Calcular rutas & Actualiza camino mínimo, rutas independientes y corte mínimo.\\
+Detalle de las rutas & Muestra las secuencias de vértices y los arcos concretos del corte.\\
+Comparar escenarios & Muestra G0, G1 y G2 con los mismos extremos seleccionados.\\
+Cargar escenario & Reemplaza la red editable por una configuración de referencia.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+El dibujo usa coordenadas relativas para ubicar los diez vértices, independientemente de la longitud de los caminos. La entrada elegida se representa en verde y la salida en naranja. Los arcos activos se dibujan en gris y los bloqueados en gris discontinuo; el pasillo seleccionado presenta un halo azul. Se curvan conexiones cuando su trazado recto podría pasar sobre otros vértices. Cada flecha mantiene la dirección del arco original. Los cuatro modos de visualización son:
+\begin{itemize}[leftmargin=1.7em]
+\item \textbf{Red:} representación de los pasillos activos y bloqueados, sin resaltar resultados.
+\item \textbf{Camino mínimo:} los arcos de la ruta más corta se destacan en azul grueso.
+\item \textbf{Rutas independientes:} cada ruta recibe un color y etiquetas R1, R2, R3, etc., sobre sus arcos. Las rutas se enumeran también en texto.
+\item \textbf{Corte mínimo:} los arcos que desconectan la entrada de la salida se destacan en rojo grueso. El texto indica los pares ordenados que componen el corte.
+\end{itemize}
+La separación de las vistas evita superponer resultados que pueden contener un mismo arco, por ejemplo, un arco que pertenece al camino mínimo y también al corte. La pestaña de comparación contiene las tres configuraciones de referencia y no sustituye sus filas por ediciones libres del usuario. Los resultados de estas ediciones aparecen en los indicadores y detalles de la red actual. Las capturas de los escenarios se incorporan en la sección siguiente.
+
+\section{Resultados y análisis de tres configuraciones}
+\subsection{Metodología del análisis matemático}
+Se estudian tres escenarios con los mismos vértices y los mismos extremos $s$ y $t$: la red original $G_0$; $G_1$, obtenida al bloquear $(H,t)$; y $G_2$, obtenida al incorporar $(A,t)$ a la red original. Las modificaciones se consideran \emph{por separado}, no de manera acumulativa. Para cada escenario se exhibe un camino de menor longitud y se justifica su minimalidad. Además, se proporciona una familia de caminos disjuntos por arcos y un corte de igual cardinalidad: esta coincidencia certifica matemáticamente que ambos son óptimos. Los resultados matemáticos se contrastan con las salidas documentadas de los módulos integrados y con las ejecuciones verificadas en la interfaz gráfica y por consola.
+
+\subsection{Escenario 0: red original}
+Para $G_0=(V,E)$, $|V|=10$ y $|E|=18$. Un camino mínimo es
+\[P_{\min}=s\to B\to F\to t,\qquad d_{G_0}(s,t)=3.\]
+Su minimalidad se puede justificar observando que no hay arco directo $s\to t$ ni existe una ruta de dos arcos: los vecinos de $s$ son $A,B,C$ y ninguno tiene un arco directo a $t$.
+
+Se verifica una familia de tres caminos dirigidos sin arcos compartidos:
+\begin{align*}
+P_1&=s\to B\to F\to t,\\
+P_2&=s\to A\to D\to G\to t,\\
+P_3&=s\to C\to E\to H\to t.
+\end{align*}
+El conjunto $C_0=\{(s,A),(s,B),(s,C)\}$ desconecta la entrada del resto de la red y tiene cardinalidad tres. Se exhiben tres caminos y un corte de tres arcos; por la proposición anterior, ambos son óptimos. En consecuencia, $\lambda_{G_0}(s,t)=|C_0|=3$.
+
+\captura{g0-rutas.png}{Configuración original: vista de rutas independientes y sus indicadores.}{Cargar G0, seleccionar Rutas independientes y mostrar las tres rutas con los indicadores 3, 3 y 3.}
+
+\subsection{Escenario 1: bloqueo del pasillo $H\to t$}
+En $G_1=(V,E\setminus\{(H,t)\})$, quedan diecisiete arcos activos. El camino $s\to B\to F\to t$ permanece disponible y sigue teniendo longitud tres. Sin embargo, el destino ahora solo recibe los arcos $(F,t)$ y $(G,t)$, por lo que como máximo pueden existir dos caminos dirigidos sin compartir arcos. Se presentan dos:
+\begin{align*}
+Q_1&=s\to B\to F\to t,\\
+Q_2&=s\to A\to D\to G\to t.
+\end{align*}
+El corte $C_1=\{(F,t),(G,t)\}$ tiene cardinalidad dos y elimina las únicas entradas activas hacia $t$. Por tanto, $\lambda_{G_1}(s,t)=|C_1|=2$.
+
+El bloqueo reduce la redundancia de la red de tres rutas a dos, aunque \emph{no altera} la longitud de un camino mínimo. Esto muestra que distancia mínima y disponibilidad de rutas independientes describen propiedades diferentes.
+
+\captura{g1-corte.png}{Configuración G1: bloqueo de $H\to t$ y corte mínimo.}{Cargar G1, elegir Corte mínimo y mostrar el arco bloqueado y los dos arcos críticos $(F,t)$ y $(G,t)$.}
+
+\subsection{Escenario 2: nuevo pasillo $A\to t$}
+En $G_2=(V,E\cup\{(A,t)\})$, existen diecinueve arcos activos. La nueva conexión produce el camino $s\to A\to t$ de longitud dos. No puede existir un camino de longitud uno porque no se incorporó el arco directo $(s,t)$; así, la distancia mínima es dos.
+
+Una familia de tres caminos disjuntos por arcos es
+\begin{align*}
+R_1&=s\to A\to t,\\
+R_2&=s\to B\to F\to t,\\
+R_3&=s\to C\to E\to G\to t.
+\end{align*}
+El corte $C_2=\{(s,A),(s,B),(s,C)\}$ mantiene cardinalidad tres. Como siguen existiendo solo tres arcos salientes de $s$, el nuevo pasillo no aumenta el máximo de rutas independientes: $\lambda_{G_2}(s,t)=|C_2|=3$.
+
+En este escenario mejora la distancia mínima pero no se incrementa la redundancia máxima. El resultado evidencia que añadir un arco puede modificar el trayecto más corto sin elevar la conectividad por arcos entre extremos.
+
+\captura{g2-camino.png}{Configuración G2: camino mínimo por el nuevo pasillo.}{Cargar G2 y elegir Camino mínimo. Mostrar el recorrido $s\to A\to t$ y los indicadores 2, 3 y 3.}
+
+\subsection{Comparación global}
+\begin{table}[H]
+\centering
+\caption{Resultados matemáticos y de referencia del programa para los tres escenarios (elaboración propia).}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}Xcccc}
+\toprule
+Configuración & Arcos activos & $d_G(s,t)$ & $\lambda_G(s,t)$ & $|C_{\min}|$\\
+\midrule
+$G_0$: original & 18 & 3 & 3 & 3\\
+$G_1$: bloqueo $(H,t)$ & 17 & 3 & 2 & 2\\
+$G_2$: nuevo $(A,t)$ & 19 & 2 & 3 & 3\\
+\bottomrule
+\end{tabularx}
+\label{tab:escenarios}
+\end{table}
+
+En los tres escenarios existe un camino desde $s$ hasta $t$, y los valores del máximo número de rutas coinciden con los de un corte mínimo. La disminución del número máximo de rutas en $G_1$ refleja pérdida de alternativas ante un bloqueo, mientras que la mejora de distancia en $G_2$ expresa mayor eficiencia en cantidad de pasillos recorridos. Son efectos distintos representados por los indicadores de la aplicación.
+
+\section{Verificación matemática y pruebas del programa}
+\subsection{Caso independiente resuelto manualmente}
+Se define un caso pequeño distinto del grafo principal:
+\begin{align*}
+V_m&=\{s,A,B,C,t\},\\
+E_m&=\{(s,A),(s,B),(A,C),(A,t),(B,C),(B,t),(C,t)\}.
+\end{align*}
+Contiene cinco vértices y siete arcos, y puede resolverse sin ejecutar el algoritmo.
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[x=1.3cm,y=1.1cm]
+\node[vertex] (s) at (0,1) {$s$};\node[vertex] (A) at (1.8,2) {A};\node[vertex] (B) at (1.8,0) {B};\node[vertex] (C) at (3.6,1) {C};\node[vertex] (t) at (5.4,1) {$t$};
+\foreach \u/\v in {s/A,s/B,A/C,B/C,C/t}{\draw[arc] (\u)--(\v);}
+\draw[arc] (A) to[bend left=28] (t);\draw[arc] (B) to[bend right=28] (t);
+\end{tikzpicture}
+\caption{Grafo del caso manual de cinco vértices (elaboración propia).}
+\end{figure}
+\textbf{Distancia mínima.} Las rutas $s\to A\to t$ y $s\to B\to t$ tienen dos arcos. No hay arco $(s,t)$, por lo cual no existe ruta de longitud uno. Por tanto, $d_{G_m}(s,t)=2$.
+
+\textbf{Rutas independientes.} Los caminos $M_1=s\to A\to t$ y $M_2=s\to B\to t$ no comparten arcos. Además, solo hay dos arcos que salen de $s$, lo que establece $\lambda_{G_m}(s,t)\leq2$. Se concluye $\lambda_{G_m}(s,t)=2$.
+
+\textbf{Corte mínimo.} Al eliminar $C_m=\{(s,A),(s,B)\}$, $s$ queda sin conexiones salientes y no puede alcanzar $t$. Como se encontraron dos caminos independientes, ningún corte de un único arco puede desconectar ambos. En consecuencia, $|C_m|=2=\lambda_{G_m}(s,t)$.
+
+\subsection{Contraste entre el caso manual y el código}
+La función \texttt{crear\_grafo\_manual} construye exactamente la red de cinco vértices analizada a mano. Este caso se encuentra en el modo de consola de \texttt{main.py}, además de las tres configuraciones principales. El orden determinista de BFS selecciona $s\to A\to t$ cuando existen dos alternativas igualmente cortas.
+\begin{table}[H]
+\centering\small
+\caption{Contraste de la solución manual con la salida de los algoritmos.}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.15cm}XX}
+\toprule
+Indicador & Resolución manual & Resultado de los algoritmos \\
+\midrule
+Camino mínimo & $s\to A\to t$ (o $s\to B\to t$) & $s\to A\to t$ \\
+Longitud & 2 arcos & 2 arcos \\
+Rutas independientes & $s\to A\to t$; $s\to B\to t$ & Las mismas dos rutas \\
+Corte mínimo & $\{(s,A),(s,B)\}$ & $\{(s,A),(s,B)\}$ \\
+Cardinalidad & 2 & 2 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+La igualdad de los resultados confirma que las elecciones concretas del algoritmo constituyen soluciones válidas y óptimas para este caso. Si hubiera distintas rutas o cortes del mismo tamaño, se comprobaría su validez y cardinalidad, no necesariamente la igualdad literal de las secuencias. El modo de consola permite reproducir el contraste mediante \texttt{python3 -m src.main -\/-consola}.
+\captura{caso-manual.png}{Evidencia de la comparación con el caso manual mediante el modo de consola.}{Ejecutar el modo de consola y capturar la salida Gm con las dos rutas independientes, el camino de longitud dos y el corte de dos arcos.}
+
+\subsection{Verificación de certificados y pruebas automatizadas}
+El repositorio contiene pruebas escritas con \texttt{unittest}. La verificación no se limita a comparar números: para los tres escenarios de referencia se comprueba que cada camino empieza en $s$ y termina en $t$, que sus arcos son activos y respetan las direcciones, que los conjuntos de arcos de diferentes rutas son disjuntos, y que el número de rutas coincide con el tamaño del corte. Además, se ejecuta BFS sobre la red sin los arcos del corte para verificar que $t$ ya no sea alcanzable. Esta última condición evita aceptar como corte un conjunto que tenga la cardinalidad esperada pero que no desconecte la red.
+
+\begin{table}[H]
+\centering\small
+\caption{Cobertura de las pruebas presentes en el repositorio.}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.25cm}X}
+\toprule
+Archivo de prueba & Verificaciones \\
+\midrule
+\texttt{test\_camino\_minimo.py} & Restricciones iniciales, arcos inválidos, bloqueos, extremos, empates, direccionalidad y caso sin conexión.\\
+\texttt{test\_flujo\_corte.py} & Rutas con vértices compartidos pero arcos distintos, reducción por bloqueo, ausencia de conexión y extremos inválidos.\\
+\texttt{test\_integracion.py} & Longitudes de G0, G1, G2 y caso manual; salida inalcanzable.\\
+\texttt{test\_interfaz.py} & Certificados de los escenarios, extremos fijos, independencia de las configuraciones, desconexión, restablecimiento y controles Tkinter.\\
+\texttt{test\_main.py} & Equivalencia de ejecución en modo de módulo y archivo directo, sin pantalla.\\
+\bottomrule
+\end{tabularx}
+\end{table}
+La suite completa del repositorio se ejecutó con \texttt{python3 -m unittest discover -s tests -v}, completando las 18 pruebas sin omisiones ni fallos (\texttt{OK}), incluidas las pruebas de controles gráficos (\texttt{TestControlesTk}) y los escenarios de verificación automática de la interfaz. En todos los casos se validaron los certificados de rutas disjuntas por arcos, la igualdad entre la cardinalidad de rutas independientes y el tamaño del corte mínimo, la no alcanzabilidad tras bloquear los cortes y las reglas de validación del modelo.
+\captura{pruebas-unitarias.png}{Ejecución completa de las 18 pruebas automatizadas del repositorio (\texttt{unittest}).}{Ejecutar python3 -m unittest discover -s tests -v con Tkinter disponible y mostrar las 18 pruebas en estado OK.}
+
+Como contraste adicional, se comprobó también un ejemplo de seis vértices en el que el algoritmo requiere un arco residual inverso para reasignar flujo. En dicho ejemplo se parte de
+\[
+E'=\{(s,A),(s,B),(A,C),(A,D),(B,C),(C,t),(D,t)\}.
+\]
+El primer camino aumentante es $s\to A\to C\to t$. El segundo utiliza el arco residual inverso $C\to A$ para cancelar la asignación previa de $(A,C)$, produciendo las rutas finales $s\to A\to D\to t$ y $s\to B\to C\to t$, con flujo máximo y corte mínimo iguales a dos.
+
+\subsection{Caso sin conexión}
+Como prueba adicional, se bloquean los arcos $(F,t)$, $(G,t)$ y $(H,t)$ sobre G0. El vértice de salida no recibe ningún arco activo. BFS devuelve \texttt{(None, None)}, Edmonds--Karp obtiene flujo cero y \texttt{rutas\_y\_corte} devuelve \texttt{([], set())}. La aplicación muestra \enquote{Sin camino}, cero rutas independientes y corte vacío. El corte vacío es correcto porque no se necesita eliminar ningún arco adicional para impedir la conexión.
+\captura{sin-conexion.png}{Comportamiento de la aplicación cuando la salida es inalcanzable.}{En G0, bloquear los tres pasillos que llegan a $t$, pulsar Calcular rutas y mostrar los indicadores Sin camino, 0 y 0.}
+
+En todos los casos anteriores, los valores entregados por la interfaz gráfica, la salida por consola (\texttt{python3 -m src.main -\/-consola}) y la suite de pruebas coinciden exactamente con los cálculos manuales y los certificados de corte mínimo.
+
+\section{Discusión}
+Los resultados muestran que dos medidas distintas de desempeño pueden evolucionar de forma independiente. La longitud mínima informa la cantidad de pasillos necesaria para una inspección, mientras que el número máximo de rutas disjuntas por arcos informa cuántas alternativas pueden coexistir sin reutilizar conexiones. El bloqueo de $(H,t)$ conserva una ruta mínima de tres arcos, pero reduce el máximo de rutas independientes. La adición de $(A,t)$ reduce la distancia mínima a dos, pero no mejora la cantidad máxima, que está limitada por los tres arcos salientes de la entrada.
+
+La igualdad entre el máximo número de caminos disjuntos y el tamaño de un corte mínimo aporta un certificado de optimalidad: basta presentar una familia de $k$ caminos independientes y un conjunto de $k$ arcos cuyo bloqueo interrumpa todos los caminos. Esta propiedad deriva de resultados clásicos de optimización en redes \cite{ford1956,edmonds1972,kleinberg2006} y permite verificar matemáticamente los resultados entregados por el programa.
+
+Como limitación del modelo, cada arco se considera equivalente en longitud y capacidad. Por ello, los cálculos no representan diferencias de tiempo, congestión, distancia física o riesgo entre pasillos. Asimismo, el trabajo estudia la conectividad entre una entrada y una salida a la vez, no rutas simultáneas con prioridades o capacidades heterogéneas. Estas simplificaciones son deliberadas y consistentes con el problema definido.
+
+\section{Conclusiones}
+Se formuló un laberinto dirigido de diez vértices y dieciocho arcos que satisface las restricciones de la configuración inicial. Se justificó el uso de BFS para minimizar la cantidad de pasillos recorridos y el de flujo máximo con capacidad unitaria para cuantificar rutas sin arcos compartidos y obtener un corte mínimo. La equivalencia entre caminos independientes y arcos de un corte mínimo permitió certificar los resultados con evidencia combinatoria explícita.
+
+En la red original se identificaron tres rutas sin arcos compartidos y un corte mínimo de tres pasillos, con distancia mínima tres. El bloqueo de $(H,t)$ redujo la independencia máxima a dos sin cambiar esa distancia; la incorporación de $(A,t)$ redujo la distancia mínima a dos y mantuvo tres rutas independientes. El caso de cinco vértices se resolvió manualmente y sus resultados coinciden con los obtenidos mediante los algoritmos.
+
+La aplicación integra el modelo, los algoritmos y una interfaz visual que permite seleccionar extremos, editar pasillos, calcular resultados y comparar escenarios. El código propio satisface las restricciones algorítmicas del problema y distingue el camino mínimo, las rutas independientes y el corte. Las pruebas del repositorio cubren los principales casos e invariantes matemáticos, y las evidencias de ejecución en interfaz y consola corroboran el funcionamiento de todas las configuraciones previstas. El modelo mantiene deliberadamente capacidades y longitudes unitarias; extensiones a pasillos ponderados o capacidades heterogéneas requerirían adaptar la formulación.
+
+\clearpage
+\section{Repositorio y reproducibilidad}
+El código fuente se encuentra disponible en el siguiente repositorio:\par
+\url{https://github.com/gabrielgutierrez1/proyecto_grafos}\par
+La implementación descrita corresponde a la rama \texttt{main} con los tres módulos integrados. El repositorio incluye las instrucciones de ejecución, el archivo \texttt{requirements.txt}, las pruebas y los documentos de referencia.
+
+En Ubuntu o Debian, si Tkinter no está disponible, puede instalarse mediante \texttt{sudo apt install python3-tk}. Desde la raíz del repositorio, los comandos son:
+\begin{lstlisting}[language=bash]
+python3 -m src.main
+python3 -m src.main --consola
+python3 -m unittest discover -s tests -v
+\end{lstlisting}
+El primer comando abre la interfaz en una sesión de escritorio, el segundo imprime los resultados de referencia sin requerir una pantalla y el tercero ejecuta las pruebas automatizadas. En sistemas sin pantalla física y con Xvfb instalado, puede ejecutarse \texttt{xvfb-run -a python3 -m unittest discover -s tests -v} para probar también los controles gráficos. Las dependencias y las instrucciones actualizadas se mantienen en el README.
+
+\bibliographystyle{ieeetr}
+\bibliography{referencias}
+
+\appendix
+\section{Reglas de validación de la red}
+En cada intento de agregar un pasillo $(u,v)$ debe verificarse:
+\[u,v\in V,\qquad u\neq v,\qquad (u,v)\notin E,\qquad (v,u)\notin E.\]
+El bloqueo se interpreta como una exclusión temporal del conjunto activo. Las restricciones $10\leq|V|\leq12$ y $14\leq|E|\leq20$ se aplican únicamente al grafo \emph{inicial}; posteriormente pueden variar los arcos. Si no hay ruta de $s$ a $t$, la longitud debe registrarse como \enquote{sin camino}, la cantidad máxima de rutas debe ser cero y el corte mínimo debe ser el conjunto vacío.
+
+\section{Resumen de resultados de referencia}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+Caso & $d(s,t)$ & Rutas independientes & Corte mínimo \\
+\midrule
+Original $G_0$ & 3 & 3 & 3\\
+Bloqueo $(H,t)$ & 3 & 2 & 2\\
+Nuevo arco $(A,t)$ & 2 & 3 & 3\\
+Manual, cinco vértices & 2 & 2 & 2\\
+Sin conexión de $s$ a $t$ & Sin camino & 0 & 0\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{document}

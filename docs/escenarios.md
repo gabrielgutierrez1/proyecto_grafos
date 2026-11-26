@@ -1,6 +1,6 @@
 # Escenarios de Análisis y Modelación ($G_0$, $G_1$, $G_2$)
 
-Resumen técnico de la modelación matemática del laberinto (Integrante 1) y los tres escenarios comparativos manteniendo fijos `s` y `t` (Secciones 4, 5 y 7 del informe; el análisis visual y capturas finales los completará el Integrante 3).
+Resumen técnico de la modelación matemática del laberinto (Integrante 1), la interfaz gráfica e integración (Integrante 3) y los tres escenarios comparativos manteniendo fijos `s` y `t`.
 
 ## 1. Red principal $G_0 = (V, E)$
 

@@ -16,6 +16,11 @@ from .grafo import crear_grafo_manual
 
 
 def resumen_consola() -> None:
+    """Imprime en consola los resultados verificados de G0, G1, G2 y el caso manual Gm.
+
+    Returns:
+        None.
+    """
     from .escenarios import calcular_resultado, crear_escenarios
 
     escenarios = crear_escenarios() + [("Gm · Caso manual", crear_grafo_manual())]
@@ -28,6 +33,11 @@ def resumen_consola() -> None:
 
 
 def main() -> None:
+    """Procesa argumentos de línea de comandos e inicia el modo gráfico o de consola.
+
+    Returns:
+        None.
+    """
     parser = argparse.ArgumentParser(description="Simulador de laberintos dirigidos")
     parser.add_argument("--consola", action="store_true", help="verificar escenarios sin abrir una ventana")
     args = parser.parse_args()
