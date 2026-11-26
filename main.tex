@@ -18,10 +18,10 @@
 \usepackage{xcolor}
 \definecolor{azulFuerte}{HTML}{1E3A8A}
 \definecolor{azulBrillante}{HTML}{2563EB}
-\definecolor{moradoFuerte}{HTML}{6D28D9}
-\definecolor{moradoOscuro}{HTML}{4C1D95}
-\definecolor{fondoCodigo}{HTML}{F5F3FF}
-\definecolor{fondoNodo}{HTML}{EDE9FE}
+\definecolor{moradoFuerte}{HTML}{1F2937}
+\definecolor{moradoOscuro}{HTML}{000000}
+\definecolor{fondoCodigo}{HTML}{F8FAFC}
+\definecolor{fondoNodo}{HTML}{F1F5F9}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,calc,fit}
 \usepackage{float}
@@ -45,8 +45,8 @@
   belowskip=0.9em
 }
 \usepackage{titlesec}
-\titleformat{\section}{\Large\bfseries\color{moradoOscuro}}{\thesection}{1em}{}
-\titleformat{\subsection}{\large\bfseries\color{azulFuerte}}{\thesubsection}{1em}{}
+\titleformat{\section}{\Large\bfseries\color{black}}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries\color{black}}{\thesubsection}{1em}{}
 
 \newcommand{\captura}[3]{%
 \begin{figure}[H]\centering
@@ -61,7 +61,7 @@
 \usepackage{hyperref}
 \hypersetup{
   colorlinks=true,
-  linkcolor=moradoFuerte,
+  linkcolor=black,
   urlcolor=azulBrillante,
   citecolor=azulFuerte,
   pdftitle={Simulador interactivo de laberintos y rutas alternativas},
@@ -76,11 +76,11 @@
 \makeatother
 \pagestyle{fancy}
 \fancyhf{}
-\lhead{\textcolor{moradoOscuro}{\textbf{INFO1158 --- Teoría de Grafos}}}
-\rhead{\textcolor{azulFuerte}{\textbf{Proyecto 1}}}
-\cfoot{\textcolor{moradoOscuro}{\textbf{\thepage}}}
+\lhead{\textcolor{black}{\textbf{INFO1158 --- Teoría de Grafos}}}
+\rhead{\textcolor{black}{\textbf{Proyecto 1}}}
+\cfoot{\textcolor{black}{\textbf{\thepage}}}
 \renewcommand{\headrulewidth}{1pt}
-\renewcommand{\headrule}{\hbox to\headwidth{\color{moradoFuerte}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{black}\leaders\hrule height \headrulewidth\hfill}}
 \setlength{\headheight}{14pt}
 \newcommand{\E}{\mathcal{E}}
 \newcommand{\V}{\mathcal{V}}
@@ -141,7 +141,7 @@
 \end{titlepage}
 \pagenumbering{roman}
 \section*{Resumen}
-Este informe presenta el diseño, la implementación y la verificación de un simulador interactivo de laberintos representados mediante grafos dirigidos. La aplicación resuelve tres problemas: encontrar un camino con el menor número de arcos, determinar el máximo número de rutas dirigidas sin arcos compartidos e identificar un conjunto mínimo de pasillos cuyo bloqueo desconecta la entrada de la salida. Se implementó búsqueda en anchura (BFS) y flujo máximo de capacidad unitaria mediante Edmonds--Karp, con reconstrucción de rutas y extracción de un corte a partir de la red residual. El programa utiliza Python y una interfaz de escritorio desarrollada con Tkinter, ttk y Canvas. La red inicial consta de diez vértices y dieciocho arcos. Se analizan dos modificaciones independientes: bloquear $(H,t)$ reduce de tres a dos las rutas independientes sin cambiar la distancia mínima, mientras que agregar $(A,t)$ reduce dicha distancia de tres a dos y conserva tres rutas. Se contrasta un caso manual de cinco vértices con los algoritmos, se valida la suite completa de 18 pruebas automatizadas y se documentan con capturas reales de ejecución las configuraciones del simulador.
+Este informe presenta el diseño, la implementación y la verificación de un simulador interactivo de laberintos representados mediante grafos dirigidos. La aplicación resuelve tres problemas: encontrar un camino con el menor número de arcos, determinar el máximo número de rutas dirigidas sin arcos compartidos e identificar un conjunto mínimo de pasillos cuyo bloqueo desconecta la entrada de la salida. Se implementó búsqueda en anchura (BFS) y flujo máximo de capacidad unitaria mediante Edmonds--Karp, con reconstrucción de rutas y extracción de un corte a partir de la red residual. El programa utiliza Python y una interfaz de escritorio desarrollada con Tkinter, ttk y Canvas. La red inicial consta de diez vértices y dieciocho arcos. Se analizan dos modificaciones independientes: bloquear $(H,t)$ reduce de tres a dos las rutas independientes sin cambiar la distancia mínima, mientras que agregar $(A,t)$ reduce dicha distancia de tres a dos y conserva tres rutas. Finalmente, se contrasta un caso manual de cinco vértices con los algoritmos, se ejecutan las 18 pruebas unitarias del repositorio y se incluyen las capturas de cada escenario.
 
 \textbf{Palabras clave:} grafos dirigidos; búsqueda en anchura; caminos disjuntos por arcos; flujo máximo; corte mínimo; simulación.
 \tableofcontents
@@ -199,7 +199,7 @@ Pueden compartir vértices intermedios. Denotaremos por $\lambda_G(s,t)$ la máx
 \subsection{Flujos y cortes}
 Al asociar capacidad unitaria $c(u,v)=1$ a cada arco, un flujo $f$ respeta restricciones de capacidad y conservación en los vértices que no son $s$ ni $t$. Su valor es el flujo neto que sale de $s$. Un corte $s$--$t$ es una partición $(S,V\setminus S)$ con $s\in S$ y $t\notin S$; su capacidad se calcula sumando las capacidades de los arcos que salen de $S$. El teorema de flujo máximo--corte mínimo establece que el máximo valor del flujo coincide con la capacidad mínima de un corte \cite{ford1956,kleinberg2006,sedgewick2011}.
 
-En redes con capacidades enteras, puede obtenerse un flujo máximo integral. Para capacidades unitarias, sus unidades se pueden descomponer en caminos dirigidos que no comparten arcos (eventualmente descartando componentes cíclicas del flujo). Así, en este proyecto,
+En redes con capacidades enteras, puede obtenerse un flujo máximo integral. Para capacidades unitarias, sus unidades se pueden descomponer en caminos dirigidos que no comparten arcos (eventualmente descartando componentes cíclicas del flujo). Dado un subconjunto de arcos $C\subseteq E$, sea $G-C=(V,E\setminus C)$ el grafo obtenido al eliminar esos pasillos. Así, en este proyecto,
 \begin{equation}\label{eq:minmax}
 \boxed{\lambda_G(s,t)=\min\{|C|:C\subseteq E,\ t\text{ no es alcanzable desde }s\text{ en }G-C\}.}
 \end{equation}
@@ -267,7 +267,7 @@ $H$ & $t$ & $t$ & $\varnothing$ \\
 \end{table}
 
 \subsection{Verificación de las restricciones iniciales}
-La red inicial satisface $10\leq |V|\leq 12$ y $14\leq |E|\leq20$. Se tiene $s\ne t$, no existen lazos $(v,v)$, no se repiten arcos y no hay parejas recíprocas $(u,v),(v,u)$. Todos los vértices son incidentes al menos a un arco; por tanto, ninguno es aislado. Por ejemplo, la siguiente familia de caminos muestra que hay \emph{al menos} dos rutas sin arcos compartidos:
+La red inicial satisface $10\leq |V|\leq 12$ y $14\leq |E|\leq20$ (cotas exigidas únicamente en la configuración inicial). Se tiene $s\ne t$, no existen lazos $(v,v)$, no se repiten arcos y no hay parejas recíprocas $(u,v),(v,u)$. Todos los vértices son incidentes al menos a un arco; por tanto, ninguno es aislado. Por ejemplo, la siguiente familia de caminos muestra que hay \emph{al menos} dos rutas sin arcos compartidos:
 \begin{align*}
 P_1&:s\to B\to F\to t,\\
 P_2&:s\to A\to D\to G\to t,\\
@@ -352,7 +352,7 @@ Esta cota permite certificar la optimalidad cuando se exhiben $k$ caminos indepe
 \subsection{Tecnología y estructura modular}
 El programa se implementó en Python y requiere la versión 3.10 o superior. Los fragmentos de código de esta sección se extrajeron de los módulos integrados, ajustando la sangría o los saltos de línea cuando fue necesario para su presentación. Utiliza exclusivamente la biblioteca estándar para los cálculos: \texttt{collections.deque} para las colas FIFO, conjuntos para los vértices y arcos, y diccionarios para la adyacencia, predecesores y red residual. La interfaz de escritorio utiliza Tkinter, los controles temáticos de \texttt{ttk} y un \texttt{Canvas} para dibujar la red. Estas herramientas se emplean para presentación y estructuras básicas, no para resolver los algoritmos de teoría de grafos. No se requieren paquetes de \texttt{pip}; Tk debe estar instalado en el sistema.
 
-La organización modular evita duplicar cálculos y separa el modelo matemático de la representación visual. La Tabla~\ref{tab:modulos} resume los archivos principales de la versión integrada.
+La organización modular evita duplicar cálculos y separa el modelo matemático de la representación visual. Asimismo, todas las funciones principales del código fuente están documentadas mediante \texttt{docstrings} que detallan su finalidad, parámetros de entrada y resultados. La Tabla~\ref{tab:modulos} resume los archivos principales de la versión integrada.
 \begin{table}[H]
 \centering\small
 \caption{Organización del código fuente y responsabilidades.}\label{tab:modulos}
@@ -536,7 +536,7 @@ La separación de las vistas evita superponer resultados que pueden contener un 
 
 \section{Resultados y análisis de tres configuraciones}
 \subsection{Metodología del análisis matemático}
-Se estudian tres escenarios con los mismos vértices y los mismos extremos $s$ y $t$: la red original $G_0$; $G_1$, obtenida al bloquear $(H,t)$; y $G_2$, obtenida al incorporar $(A,t)$ a la red original. Las modificaciones se consideran \emph{por separado}, no de manera acumulativa. Para cada escenario se exhibe un camino de menor longitud y se justifica su minimalidad. Además, se proporciona una familia de caminos disjuntos por arcos y un corte de igual cardinalidad: esta coincidencia certifica matemáticamente que ambos son óptimos. Los resultados matemáticos se contrastan con las salidas documentadas de los módulos integrados y con las ejecuciones verificadas en la interfaz gráfica y por consola.
+Se estudian tres escenarios con los mismos vértices y los mismos extremos $s$ y $t$: la red original $G_0$; $G_1$, obtenida al bloquear $(H,t)$; y $G_2$, obtenida al incorporar $(A,t)$ a la red original. Las modificaciones se consideran \emph{por separado}, no de manera acumulativa. Para cada escenario se exhibe un camino de menor longitud y se justifica su minimalidad. Además, se proporciona una familia de caminos disjuntos por arcos y un corte de igual cardinalidad: esta coincidencia certifica matemáticamente que ambos son óptimos. Los resultados matemáticos se comparan con las salidas de los módulos integrados y con las pruebas realizadas en la interfaz gráfica y la consola.
 
 \subsection{Escenario 0: red original}
 Para $G_0=(V,E)$, $|V|=10$ y $|E|=18$. Un camino mínimo es
@@ -659,7 +659,7 @@ Archivo de prueba & Verificaciones \\
 \bottomrule
 \end{tabularx}
 \end{table}
-La suite completa del repositorio se ejecutó con \texttt{python3 -m unittest discover -s tests -v}, completando las 18 pruebas sin omisiones ni fallos (\texttt{OK}), incluidas las pruebas de controles gráficos (\texttt{TestControlesTk}) y los escenarios de verificación automática de la interfaz. En todos los casos se validaron los certificados de rutas disjuntas por arcos, la igualdad entre la cardinalidad de rutas independientes y el tamaño del corte mínimo, la no alcanzabilidad tras bloquear los cortes y las reglas de validación del modelo.
+Al ejecutar \texttt{python3 -m unittest discover -s tests -v}, pasaron las 18 pruebas (\texttt{OK}), incluidas las de controles gráficos (\texttt{TestControlesTk}) y las de escenarios de interfaz. En cada caso se comprobó que las rutas no compartan arcos, que su cantidad coincida con el tamaño del corte mínimo, que el bloqueo del corte desconecte $s$ de $t$ y que se respeten las validaciones de red.
 \captura{pruebas-unitarias.png}{Ejecución completa de las 18 pruebas automatizadas del repositorio (\texttt{unittest}).}{Ejecutar python3 -m unittest discover -s tests -v con Tkinter disponible y mostrar las 18 pruebas en estado OK.}
 
 Como contraste adicional, se comprobó también un ejemplo de seis vértices en el que el algoritmo requiere un arco residual inverso para reasignar flujo. En dicho ejemplo se parte de
@@ -686,7 +686,7 @@ Se formuló un laberinto dirigido de diez vértices y dieciocho arcos que satisf
 
 En la red original se identificaron tres rutas sin arcos compartidos y un corte mínimo de tres pasillos, con distancia mínima tres. El bloqueo de $(H,t)$ redujo la independencia máxima a dos sin cambiar esa distancia; la incorporación de $(A,t)$ redujo la distancia mínima a dos y mantuvo tres rutas independientes. El caso de cinco vértices se resolvió manualmente y sus resultados coinciden con los obtenidos mediante los algoritmos.
 
-La aplicación integra el modelo, los algoritmos y una interfaz visual que permite seleccionar extremos, editar pasillos, calcular resultados y comparar escenarios. El código propio satisface las restricciones algorítmicas del problema y distingue el camino mínimo, las rutas independientes y el corte. Las pruebas del repositorio cubren los principales casos e invariantes matemáticos, y las evidencias de ejecución en interfaz y consola corroboran el funcionamiento de todas las configuraciones previstas. El modelo mantiene deliberadamente capacidades y longitudes unitarias; extensiones a pasillos ponderados o capacidades heterogéneas requerirían adaptar la formulación.
+La aplicación integra el modelo, los algoritmos y una interfaz visual que permite seleccionar extremos, editar pasillos, calcular resultados y comparar escenarios. El código propio cumple las restricciones algorítmicas del problema y distingue el camino mínimo, las rutas independientes y el corte. Las pruebas del repositorio y las capturas de ejecución en interfaz y consola respaldan el funcionamiento de las configuraciones estudiadas. El modelo mantiene deliberadamente capacidades y longitudes unitarias; extensiones a pasillos ponderados o capacidades heterogéneas requerirían adaptar la formulación.
 
 \clearpage
 \section{Repositorio y reproducibilidad}
